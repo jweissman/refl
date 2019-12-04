@@ -41,7 +41,6 @@ class Identifier extends ReflNode {
     }
 
     evaluate(ctx: ReflContext): ReflObject {
-        // console.log("EVALUATE ID WITH NAME: " + this.name)
         if (ctx.hasDefinition(this.name)) {
             return ctx.retrieve(this.name);
         } else {
@@ -136,10 +135,8 @@ class ConditionalExpression extends ReflNode {
 
     evaluate(ctx: ReflContext): ReflObject {
         if (this.test.evaluate(ctx).value === true) {
-            // then left
             return this.left.evaluate(ctx);
         } else {
-            // the right
             return this.right.evaluate(ctx);
         }
     }
@@ -199,7 +196,6 @@ class Program extends ReflNode {
         for (const line of this.lines) {
             result = line.evaluate(ctx);
             if (result instanceof ReflReturn) {
-                // early return!
                 return result.wrapped;
             } 
         }
@@ -216,7 +212,6 @@ semantics.addAttribute('tree', {
         return argList.tree.map((id: Identifier) => id.name);
     },
 
-    // one-liner
     Defun_one: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, body.tree),
 
