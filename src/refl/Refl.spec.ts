@@ -1,6 +1,6 @@
 import Refl from "./Refl"
 
-describe("Refl", () => {
+describe(Refl, () => {
     let refl: Refl;
     beforeEach(() => { refl = new Refl(); })
     describe('arithmetic', () => {
@@ -38,9 +38,19 @@ describe("Refl", () => {
     })
 
     describe('variables', () => {
-        xit('defines', () => {
+        it('defines', () => {
             expect(refl.interpret('a = 5')).toEqual(5)
             expect(refl.interpret('a * 10')).toEqual(50)
+            expect(refl.interpret('b = 12')).toEqual(12)
+            expect(refl.interpret('a * b')).toEqual(60)
+            expect(refl.interpret('b / 2')).toEqual(6)
+            expect(refl.interpret('b ^ 2')).toEqual(144)
+        })
+    })
+
+    describe('funcalls', () => {
+        xit('defines', () => {
+            expect(refl.interpret('double = (x) => x * 2')).toEqual('double')
         })
     })
 })

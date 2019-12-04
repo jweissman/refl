@@ -3,11 +3,9 @@ import Grammar from './Grammar';
 import { Semantics, Node } from 'ohm-js';
 import { ReflObject } from './ReflObject';
 import { ReflInt } from './ReflInt';
+import { ReflNode } from './ReflNode';
+import { ReflContext } from "./ReflContext";
 const semantics: Semantics = Grammar.createSemantics();
-
-abstract class ReflNode {
-    abstract evaluate(): ReflObject;
-}
 
 class NumberLiteral extends ReflNode {
     constructor(public value: number) { super(); }
@@ -18,12 +16,15 @@ class NumberLiteral extends ReflNode {
 
 type BinaryOperator = '+' | '-' | '*' | '/' | '^'
 class BinaryExpression extends ReflNode {
-    constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) {
-        super();
+    constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) { super(); }
+    evaluate(ctx: ReflContext): ReflObject {
+        let left = this.left.evaluate(ctx);
+        let right = this.right.evaluate(ctx);
+        return left.send(this.operation, [ right ]);
     }
 
-    evaluate(): ReflObject {
-        let message = null;
+    private get operation(): string {
+        let message;
         switch (this.op) {
             case '+': message = 'plus'; break;
             case '-': message = 'minus'; break;
@@ -32,14 +33,41 @@ class BinaryExpression extends ReflNode {
             case '^': message = 'pow'; break;
             default: assertNever(this.op);
         }
-        let left = this.left.evaluate();
-        let right = this.right.evaluate();
-        // console.debug("BinaryExpression.evaluate", { message, left, right })
-        return left.send(message as string, [ right ]);
+        return message as string;
+    }
+}
+
+class Identifier extends ReflNode {
+    constructor(public name: string) {
+        super();
+    }
+
+    evaluate(ctx: ReflContext): ReflObject {
+        if (ctx.hasDefinition(this.name)) {
+            return ctx.retrieve(this.name);
+        } else {
+            throw new Error(`Undefined identifier ${this.name}`);
+        }
+    }
+}
+
+class AssignmentExpression extends ReflNode {
+    constructor(public left: Identifier, public right: ReflNode) {
+        super();
+    }
+
+    evaluate(ctx: ReflContext): ReflObject {
+        let slot = this.left.name;
+        let value = this.right.evaluate(ctx);
+        ctx.assign(slot, value);
+        return value;
     }
 }
 
 semantics.addAttribute('tree', {
+    Assignment: (left: Node, _eq: Node, right: Node): AssignmentExpression =>
+      new AssignmentExpression(left.tree, right.tree),
+
     ExpExpr_power: (left: Node, _add: Node, right: Node): BinaryExpression =>
       new BinaryExpression('^', left.tree, right.tree),
 
@@ -57,10 +85,14 @@ semantics.addAttribute('tree', {
 
     number: (element: Node): NumberLiteral =>
       new NumberLiteral(Number(element.sourceString)),
+    
+    ident: (fst: Node, rst: Node): Identifier =>
+      new Identifier(fst.sourceString),
 });
 
+let globalCtx = new ReflContext();
 semantics.addOperation('eval', {
-    Expr: (e: Node) => e.tree.evaluate()
+    Expr: (e: Node) => e.tree.evaluate(globalCtx),
 });
 
 export default semantics;

@@ -6,7 +6,11 @@ Refl {
       = Expr
 
     Expr
-      = AddExpr
+      = Assignment
+      | AddExpr
+
+    Assignment
+      = ident "=" Expr
     
     AddExpr
       = AddExpr "+" MultExpr -- sum
@@ -23,7 +27,11 @@ Refl {
       | PriExpr
 
     PriExpr
-      = number
+      = ident
+      | number
+
+    ident
+      = letter alnum*
     
     number
       = digit+

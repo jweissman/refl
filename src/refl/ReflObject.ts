@@ -1,14 +1,16 @@
 export abstract class ReflObject {
     [method: string]: any;
+    abstract toJS(): number | string;
+
     send(message: string, args: ReflObject[]): ReflObject {
-        // console.debug("ReflObject.send", { message, args });
-        let receive = this[message];
-        if (!!receive) {
+        if (!!this[message]) {
             return this[message](...args);
-        }
-        else {
-            throw new Error(`Undefined method '${message}' called on ${this.constructor.name}`);
+        } else {
+            throw new Error(this.methodMissingWarning(message));
         }
     }
-    abstract toJS(): number | string;
+
+    private methodMissingWarning(message: string) {
+        return `Undefined method '${message}' called on ${this.constructor.name}`
+    }
 }
