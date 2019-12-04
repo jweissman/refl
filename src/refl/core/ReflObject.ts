@@ -1,6 +1,7 @@
 export abstract class ReflObject {
     [method: string]: any;
-    abstract toJS(): number | string;
+
+    abstract toJS(): boolean | number | string | null;
 
     send(message: string, args: ReflObject[]): ReflObject {
         if (!!this[message]) {

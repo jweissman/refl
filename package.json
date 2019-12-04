@@ -4,6 +4,7 @@
   "private": true,
   "bin": {
     "refl": "./bin/index.ts"
+
   },
   "dependencies": {
     "@types/jest": "^24.0.23",
@@ -24,7 +25,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "eslintConfig": {
     "extends": "react-app"

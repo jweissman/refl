@@ -1,23 +1,46 @@
 Refl {
     Program
-      = Stmt+
+      = ListOf<Stmt, StmtDelim>
 
     Stmt
       = Expr
+      
+    StmtDelim = #";"
 
     Expr
       = Assignment
       | Defun
-      | AddExpr
+      | Conditional
+      | CmpExpr
+
+	  Block = "{" Program "}"
+
+    Conditional
+      = Expr "?" Expr ":" Expr
     
     Defun
-      = FunArgs "=>" Expr
+      = FunArgs "=>" Expr -- one
+      | FunArgs Block -- multi
     
     FunArgs
       = "(" ListOf<ident, ","> ")"
     
     Assignment
       = ident "=" Expr
+
+    CmpExpr
+      = LogExpr ">" LogExpr -- gt
+      | LogExpr "<" LogExpr -- lt
+      | LogExpr "==" LogExpr -- eq
+      | LogExpr "<=" LogExpr -- lte
+      | LogExpr ">=" LogExpr -- gte
+      | LogExpr
+    
+    LogExpr
+      = LogExpr "||" AddExpr -- or 
+      | LogExpr "&&" AddExpr -- and
+      | "!" LogExpr -- not
+      | AddExpr
     
     AddExpr
       = AddExpr "+" MultExpr -- sum
@@ -34,8 +57,13 @@ Refl {
       | PriExpr
 
     PriExpr
-      = ident
+      = Funcall
+      // | "(" Expr ")" -- parens (todo)
+      | ident
       | number
+    
+    Funcall
+      = ident "(" ListOf<Expr, ","> ")"
 
     ident
       = letter alnum*

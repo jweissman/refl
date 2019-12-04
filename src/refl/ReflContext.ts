@@ -1,10 +1,16 @@
-import { ReflObject } from "./ReflObject";
+import { ReflObject } from "./core/ReflObject";
+import ReflBool from "./core/ReflBool";
 
 type ReflStore = { [ key: string ]: ReflObject }
 export class ReflContext {
-    store: ReflStore = {}
+    private store: ReflStore;
 
-    constructor() {}
+    constructor(baseStore: ReflStore | null = null) {
+        this.store = baseStore || {
+            true: ReflBool.TRUE,
+            false: ReflBool.FALSE,
+        };
+    }
 
     assign(key: string, value: ReflObject) {
         this.store[key] = value;
@@ -17,4 +23,9 @@ export class ReflContext {
     hasDefinition(key: string): any {
         return !!this.store[key];
     }
+
+    clone(): ReflContext {
+        let newContext = new ReflContext({...this.store});
+        return newContext;
+    } 
 };
