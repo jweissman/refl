@@ -10,7 +10,7 @@ export default class Refl {
     context: ReflContext = new ReflContext();
     interpret(input: string) {
         if (input.trim().length === 0) { return; }
-        let match = Grammar.match(input);
+        let match = Grammar.match(input.trim());
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
             try {
@@ -20,8 +20,9 @@ export default class Refl {
                 console.log(chalk.red("Error: " + e.message));
             }
         } else {
-            console.trace(match.message)
-            throw new Error("Syntax error found at " + match.shortMessage)
+            console.debug(chalk.blue(match.message))
+            console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
+        return '...';
     }
 }

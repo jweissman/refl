@@ -7,8 +7,15 @@ Refl {
 
     Expr
       = Assignment
+      | Defun
       | AddExpr
-
+    
+    Defun
+      = FunArgs "=>" Expr
+    
+    FunArgs
+      = "(" ListOf<ident, ","> ")"
+    
     Assignment
       = ident "=" Expr
     

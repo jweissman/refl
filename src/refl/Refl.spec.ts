@@ -39,9 +39,9 @@ describe(Refl, () => {
 
     describe('variables', () => {
         it('defines', () => {
-            expect(refl.interpret('a = 5')).toEqual(5)
+            expect(refl.interpret('a = 5')).toEqual('a')
             expect(refl.interpret('a * 10')).toEqual(50)
-            expect(refl.interpret('b = 12')).toEqual(12)
+            expect(refl.interpret('b = 12')).toEqual('b')
             expect(refl.interpret('a * b')).toEqual(60)
             expect(refl.interpret('b / 2')).toEqual(6)
             expect(refl.interpret('b ^ 2')).toEqual(144)
@@ -51,6 +51,7 @@ describe(Refl, () => {
     describe('funcalls', () => {
         xit('defines', () => {
             expect(refl.interpret('double = (x) => x * 2')).toEqual('double')
+            expect(refl.interpret("double(2)")).toEqual(4)
         })
     })
 })

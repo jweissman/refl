@@ -5,6 +5,8 @@ import { ReflObject } from './ReflObject';
 import { ReflInt } from './ReflInt';
 import { ReflNode } from './ReflNode';
 import { ReflContext } from "./ReflContext";
+import { ReflFunction } from './ReflFunction';
+import { ReflString } from './ReflString';
 const semantics: Semantics = Grammar.createSemantics();
 
 class NumberLiteral extends ReflNode {
@@ -60,11 +62,29 @@ class AssignmentExpression extends ReflNode {
         let slot = this.left.name;
         let value = this.right.evaluate(ctx);
         ctx.assign(slot, value);
-        return value;
+        return new ReflString(slot);
+    }
+}
+
+class FunctionLiteral extends ReflNode {
+    constructor(public args: string[], public body: ReflNode) {
+        super();
+    }
+
+    evaluate(ctx: ReflContext): ReflObject {
+        // let argNames = this.args.map(arg => arg.name)
+        return new ReflFunction(this.args, this.body);
     }
 }
 
 semantics.addAttribute('tree', {
+    FunArgs: (_lp: Node, argList: Node, _rp: Node): string[] =>  {
+        return argList.children.map(c => c.sourceString);
+    },
+
+    Defun: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
+      new FunctionLiteral(args.tree, body.tree),
+
     Assignment: (left: Node, _eq: Node, right: Node): AssignmentExpression =>
       new AssignmentExpression(left.tree, right.tree),
 
@@ -87,7 +107,7 @@ semantics.addAttribute('tree', {
       new NumberLiteral(Number(element.sourceString)),
     
     ident: (fst: Node, rst: Node): Identifier =>
-      new Identifier(fst.sourceString),
+      new Identifier(fst.sourceString + rst.sourceString),
 });
 
 let globalCtx = new ReflContext();
