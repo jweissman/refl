@@ -1,0 +1,30 @@
+Refl {
+    Program
+      = Stmt+
+
+    Stmt
+      = Expr
+
+    Expr
+      = AddExpr
+    
+    AddExpr
+      = AddExpr "+" MultExpr -- sum
+      | AddExpr "-" MultExpr -- difference
+      | MultExpr
+
+    MultExpr
+      = MultExpr "*" ExpExpr -- product
+      | MultExpr "/" ExpExpr -- quotient
+      | ExpExpr
+
+    ExpExpr
+      = PriExpr "^" ExpExpr -- power
+      | PriExpr
+
+    PriExpr
+      = number
+    
+    number
+      = digit+
+}
