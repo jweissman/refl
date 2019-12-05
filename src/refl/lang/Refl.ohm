@@ -1,11 +1,11 @@
 Refl {
     Program
-      = ListOf<Stmt, StmtDelim>
+      = ListOf<Stmt, StmtDelim?>
 
     Stmt
-      = Expr
-      
-    StmtDelim = #";"
+      = Expr StmtDelim? 
+     
+    StmtDelim = #";" | #"\n"
 
     Expr
       = Assignment
@@ -16,8 +16,10 @@ Refl {
 	  Block = "{" Program "}"
 
     Conditional
-      = Expr "?" Expr ":" Expr
-    
+      = Expr "?" Expr ":" Expr -- ternary
+      | "if" "(" Expr ")" Block "else" Block -- if_else
+      | "if" "(" Expr ")" Block -- if
+ 
     Defun
       = FunArgs "=>" Expr -- one
       | FunArgs Block -- multi
@@ -58,7 +60,9 @@ Refl {
 
     PriExpr
       = Funcall
-      // | "(" Expr ")" -- parens (todo)
+      | "(" Expr ")" -- parens
+      // | "+" PriExpr -- pos 
+      | "-" PriExpr -- neg 
       | ident
       | number
     
@@ -70,4 +74,10 @@ Refl {
     
     number
       = digit+
+
+  comment
+      = #"#" #(~"\n" any)* "\n"?
+
+	space += comment  
+    
 }

@@ -19,8 +19,8 @@ module.exports = {
         "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
     },
     globals: {
-        'ts-jest': {
-          tsConfig: 'tsconfig.test.json'
-        }
+        // 'ts-jest': {
+        //   tsConfig: './tsconfig.test.json'
+        // }
     }
 }

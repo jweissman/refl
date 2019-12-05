@@ -1,5 +1,5 @@
-import Grammar from './Grammar';
-import Semantics from './Semantics';
+import Grammar from './lang/Grammar';
+import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
 import { ReflObject } from './core/ReflObject';
 import { ReflContext } from './ReflContext';
@@ -14,7 +14,7 @@ export default class Refl {
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
             let output = args.map(arg => arg.value);
-            console.log(...output);
+            console.log(chalk.blue(...output));
             Refl.tracedOutput.push(...output);
             return new ReflNil();
         },
@@ -42,5 +42,23 @@ export default class Refl {
             console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
         return '...';
+    }
+
+    repl() {
+        const clear = require('clear');
+        const chalk = require('chalk');
+        const figlet = require('figlet');
+        const repl = require('repl');
+        clear();
+        console.log(chalk.green(figlet.textSync('refl')))
+        console.log("\n" + chalk.blue("Refl") + chalk.gray("Repl"));
+        repl.start({
+            prompt: "\n(refl) ",
+            eval: (input: string, _ctx: any, _filename: any, cb: any) => {
+                const out = this.interpret(input) || 'nil';
+                if (out) { cb(null, out) };
+            }
+        })
+
     }
 }

@@ -25,6 +25,10 @@ export class ReflInt extends ReflObject {
         return this.compute(other, Math.pow)
     }
 
+    negate(): ReflInt {
+        return new ReflInt(-this.value);
+    }
+
     gt(other: ReflInt): ReflBool {
         if (this.value > other.value) {
             return ReflBool.TRUE;
@@ -47,17 +51,11 @@ export class ReflInt extends ReflObject {
     }
 
     lte(other: ReflInt): ReflBool {
-        if (this.value <= other.value) {
-            return ReflBool.TRUE;
-        }
-        return ReflBool.FALSE;
+        return this.lt(other).or(this.eq(other));
     }
 
     gte(other: ReflInt): ReflBool {
-        if (this.value >= other.value) {
-            return ReflBool.TRUE;
-        }
-        return ReflBool.FALSE;
+        return this.gt(other).or(this.eq(other));
     }
 
     toJS(): number {

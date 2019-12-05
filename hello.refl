@@ -1,4 +1,4 @@
-fib = (n) => n <= 2 ? 1 : fib(n-1) + fib(n-2);
+fib = (n) => n <= 1 ? 1 : fib(n-1) + fib(n-2);
 forever = (f,i) { f(i); forever(f, i+1) };
 loop = (x) => print(x,fib(x));
-forever(loop,1)
+forever(loop,0)

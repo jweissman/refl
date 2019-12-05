@@ -2,9 +2,17 @@ import Refl from "./Refl"
 
 describe(Refl, () => {
     let refl: Refl;
-    beforeEach(() => { refl = new Refl(); })
+    beforeEach(() => {
+        Refl.tracedOutput = [];
+        refl = new Refl();
+    })
 
-    test.todo("comments")
+    describe("comments", () => {
+        it('ignores anything after an octothorpe (#)', () => {
+            expect(refl.interpret("1+2 # +3-4")).toEqual(3)
+            expect(refl.interpret("1+ # +3-4\n5")).toEqual(6)
+        })
+    })
 
     describe('arithmetic', () => {
         it('adds two numbers', () => {
@@ -39,7 +47,15 @@ describe(Refl, () => {
             expect(refl.interpret('1-100/4+1')).toEqual(-23);
         })
 
-        test.todo("parentheses help ordering")
+        it("negative numbers", () => {
+            expect(refl.interpret("-3")).toEqual(-3)
+            expect(refl.interpret("10+-1")).toEqual(9)
+        })
+
+        it("parentheses help ordering", () => {
+            expect(refl.interpret("3*(2+1)")).toEqual(9)
+            expect(refl.interpret("(2-1)*5")).toEqual(5)
+        })
     })
 
     describe('variables', () => {
@@ -87,6 +103,7 @@ describe(Refl, () => {
         })
 
         it('calls builtins', () => {
+            Refl.tracedOutput = []
             refl.interpret('print(123)');
             expect(Refl.tracedOutput).toEqual([123]);
         })
@@ -118,25 +135,59 @@ describe(Refl, () => {
             expect(refl.interpret('burj>wt ? 1 : 0')).toEqual(1)
         })
 
-        it("boolean algebra", () => {
-            // and - &&
-            expect(refl.interpret("true && true")).toEqual(true)
-            expect(refl.interpret("true && false")).toEqual(false)
-            expect(refl.interpret("false && true")).toEqual(false)
-            expect(refl.interpret("false && false")).toEqual(false)
+        describe('conditionals with if/else', () => {
+            it('given test is positive, activates the left branch', () => {
+                refl.interpret('if (true) { print(1); } else { print(-1); }')
+                expect(Refl.tracedOutput).toEqual([1]);
+            });
+
+            it('given test is negative, activates the right branch', () => {
+                refl.interpret('if (false) { print(1); } else { print(-1); }')
+                expect(Refl.tracedOutput).toEqual([-1]);
+            });
+        });
+
+        describe('conditions with only if', () => {
+            it('given test is positive, activates the branch', () => {
+                refl.interpret('if (true) { print(1); }')
+                expect(Refl.tracedOutput).toEqual([1]);
+            });
+
+            it('given test is negative, activates the right branch', () => {
+                refl.interpret('if (false) { print(1); }')
+                expect(Refl.tracedOutput).toEqual([]);
+            });
+        })
+
+        test.todo('conditionals with unless/else')
+
+        describe("boolean algebra", () => {
+            it('and', () => {
+                expect(refl.interpret("true && true")).toEqual(true)
+                expect(refl.interpret("true && false")).toEqual(false)
+                expect(refl.interpret("false && true")).toEqual(false)
+                expect(refl.interpret("false && false")).toEqual(false)
+            });
 
             // or - ||
-            expect(refl.interpret("true || true")).toEqual(true)
-            expect(refl.interpret("true || false")).toEqual(true)
-            expect(refl.interpret("false || true")).toEqual(true)
-            expect(refl.interpret("false || false")).toEqual(false)
+            it('or', () => {
+                expect(refl.interpret("true || true")).toEqual(true)
+                expect(refl.interpret("true || false")).toEqual(true)
+                expect(refl.interpret("false || true")).toEqual(true)
+                expect(refl.interpret("false || false")).toEqual(false)
+            });
 
             // not - !
-            expect(refl.interpret("!true")).toEqual(false)
-            expect(refl.interpret("!false")).toEqual(true)
-            expect(refl.interpret("!!true")).toEqual(true)
-            expect(refl.interpret("!!false")).toEqual(false)
+            it('or', () => {
+                expect(refl.interpret("!true")).toEqual(false)
+                expect(refl.interpret("!false")).toEqual(true)
+                expect(refl.interpret("!!true")).toEqual(true)
+                expect(refl.interpret("!!false")).toEqual(false)
+            });
         })
+
+        test.todo('iteration with while/until')
+        test.todo('iteration with for')
     })
 
     test.todo("string lit")
@@ -146,6 +197,8 @@ describe(Refl, () => {
     test.todo("iteration")
 
     test.todo("ranges")
+
+    test.todo("mirrors")
     // mirror object: tells you what the structure of function is
     // reflection: give me a class by name, instantiate or call fn by string literal
 })

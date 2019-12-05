@@ -11,6 +11,8 @@ export abstract class ReflObject {
         }
     }
 
+    self() { return this; }
+
     private methodMissingWarning(message: string) {
         return `Undefined method '${message}' called on ${this.constructor.name}`
     }
