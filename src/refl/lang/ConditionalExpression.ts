@@ -2,7 +2,7 @@ import { ReflObject } from '../core/ReflObject';
 import { ReflNode, ReflProgram, PreludeContext } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 import { ReflNil } from '../core/ReflNil';
-import ReflReturn from '../core/ReflReturn';
+// import ReflReturn from '../core/ReflReturn';
 import { instruct } from 'myr';
 
 export class ConditionalExpression extends ReflNode {
@@ -23,7 +23,7 @@ export class ConditionalExpression extends ReflNode {
                 ...this.test.instructions,
                 instruct('push', { value: true }),
                 instruct('cmp'),
-                instruct('jump_if_zero', {value: true, target: `${this.label}-truthy`}),
+                instruct('jump_if_zero', {target: `${this.label}-truthy`}),
                 instruct('noop', { label: `${this.label}-falsy`}),
                 ...(this.right ? this.right.instructions : []),
                 instruct('jump', { target: `${this.label}-done`}),
@@ -31,7 +31,6 @@ export class ConditionalExpression extends ReflNode {
                 ...this.left.instructions,
                 instruct('noop', { label: `${this.label}-done`}),
             ]
-            throw new Error("Method not implemented.");
         } else {
             throw new Error("No label for conditional -- prelude not run?");
         }
@@ -47,10 +46,10 @@ export class ConditionalExpression extends ReflNode {
         }
 
         // return expr;
-        if (expr instanceof ReflReturn) {
-            return expr;
-        } else {
-            return new ReflNil();
-        }
+        // if (expr instanceof ReflReturn) {
+        //     return expr;
+        // } else {
+        return new ReflNil();
+        // }
     }
 }

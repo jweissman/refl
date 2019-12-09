@@ -3,7 +3,7 @@ import { ReflObject } from '../core/ReflObject';
 import { ReflNode, ReflProgram } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 import { UnaryOperator } from './UnaryOperator';
-import { instruct } from 'myr';
+import { instruct, OpCode } from 'myr';
 export class UnaryExpression extends ReflNode {
     constructor(public unOp: UnaryOperator, public operand: ReflNode) { super(); }
     evaluate(ctx: ReflContext): ReflObject {
@@ -29,10 +29,19 @@ export class UnaryExpression extends ReflNode {
     // todo enable other ops?
     prelude() { return []; }
     get instructions(): ReflProgram {
-        // let opMap = { '!': 'not', '-': 'negate', '()': 'noop' }
+        let strategy: {[key: string]: ReflProgram} = {
+            // '!': 'not',
+            '-': [
+                instruct('dup'),
+                instruct('push', {value: 2}),
+                instruct('mul'),
+                instruct('sub'),
+             ], // 'negate',
+            '()': [instruct('noop')]
+        }
         return [
             ...this.operand.instructions,
-            instruct('noop'), //{ op: 'noop' } //opMap[this.unOp] }
+            ...strategy[this.unOp],
         ];
     }
 }

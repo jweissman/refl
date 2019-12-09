@@ -19,8 +19,20 @@ let ctx: PreludeContext = {
     }
 }
 
+const stripMain = (program: ReflProgram) => {
+    return program.map(instruction => {
+        if (instruction.label && instruction.label === 'main') {
+            delete instruction.label;
+        }
+        return instruction;
+    })
+}
+
 export class ReflInterpreter {
     interpreter: Interpreter<number | string | boolean> = new Interpreter(integerAlgebra);
+
+    activeProgram: ReflProgram = [];
+
     run(program: ReflNode[]): ReflObject {
         // console.log("ReflInterpreter#run", { program })
 
@@ -36,10 +48,12 @@ export class ReflInterpreter {
             ...instructions,
         ]
 
-        // console.log("RUNNING CODE...!", { code })
-        this.interpreter.run(code)
+        this.activeProgram = [ ...stripMain(this.activeProgram), ...code ];
+
+        console.log("RUNNING CODE...!", { code: this.activeProgram })
+        this.interpreter.run(this.activeProgram)
         let { result } = this.interpreter
-        console.log("RAN", { code, result })
+        // console.log("RAN", { code, result })
         if (result !== null) {
             if (typeof result === 'number') {
                 return new ReflInt(result);

@@ -6,23 +6,24 @@ import { ReflContext } from './ReflContext';
 
 import chalk from 'chalk';
 import { ReflNil } from './core/ReflNil';
-import ReflReturn from './core/ReflReturn';
+// import ReflReturn from './core/ReflReturn';
 import { ReflInterpreter } from './ReflInterpreter';
 
 export default class Refl {
+    interpreter = new ReflInterpreter();
     static tracedOutput: string[] = []
 
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
-            let output = args.map(arg => arg.value);
-            console.log(chalk.blue(...output));
-            Refl.tracedOutput.push(...output);
+            // let output = args.map(arg => arg.value);
+            console.log(chalk.bgBlue(chalk.whiteBright(args)));
+            Refl.tracedOutput.push(...args);
             return new ReflNil();
         },
 
-        "return": (object: ReflObject) => {
-            return new ReflReturn(object);
-        }
+        // "return": (object: ReflObject) => {
+        //     return new ReflReturn(object);
+        // }
     }
 
     context: ReflContext = new ReflContext();
@@ -30,7 +31,6 @@ export default class Refl {
     // TODO see https://nodejs.org/api/repl.html#repl_recoverable_errors
     // for handling multi-line input (if we hit a syntax error, could assume we may need more input?)
     interpret(input: string) {
-        // let interpreter = new ReflInterpreter();
         if (input.trim().length === 0) { return; }
         let match = Grammar.match(input.trim());
         if (match.succeeded()) {
@@ -38,7 +38,9 @@ export default class Refl {
             try {
                 // debugger;
                 // return interpreter.run(semanteme.tree.instructions).toJS();
-                let value: ReflObject = semanteme.eval()[0];
+                let value: ReflObject = 
+                    this.interpreter.run(semanteme.tree);
+                    // semanteme.eval()[0];
                 return value.toJS();
             } catch(e) {
                 console.log(chalk.red("Error: " + e.message));

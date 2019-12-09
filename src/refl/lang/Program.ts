@@ -2,7 +2,7 @@ import { ReflObject } from '../core/ReflObject';
 import { ReflNode, PreludeContext, ReflProgram } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 import { ReflNil } from '../core/ReflNil';
-import ReflReturn from '../core/ReflReturn';
+// import ReflReturn from '../core/ReflReturn';
 // import { ReflInstruction } from '../ReflInterpreter';
 
 export class Program extends ReflNode {
@@ -22,13 +22,13 @@ export class Program extends ReflNode {
         let result = null;
         for (const line of this.lines) {
             result = line.evaluate(ctx);
-            if (result instanceof ReflReturn) {
-                if (this.isFunction) {
-                    return result.wrapped;
-                } else { 
-                    return result;
-                }
-            }
+            // if (result instanceof ReflReturn) {
+            //     if (this.isFunction) {
+            //         return result.wrapped;
+            //     } else { 
+            //         return result;
+            //     }
+            // }
         }
         return result || new ReflNil();
     }

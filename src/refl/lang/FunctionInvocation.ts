@@ -36,14 +36,20 @@ export class FunctionInvocation extends ReflNode {
         let pushArgs: ReflProgram = this.paramList.reverse().flatMap(
             param => param.instructions
         );
-        // debugger;
-        return [
-            ...pushArgs,
-            // instruct('push')
-            instruct('load', { key: this.id.name }),
-            // call from top of stack...?
-            instruct('invoke'),
-        ];
-        // throw new Error("Method not implemented.");
+        let fnName = this.id.name;
+        let builtin = Refl.builtins[fnName];
+        if (builtin) {
+            let callBuiltin = instruct('exec', { jsMethod: builtin, arity: this.paramList.length });
+            return [...pushArgs, callBuiltin]
+        } else if (this.id.name === 'return') {
+            // handle return here, that should be okay right? :D
+            return [...pushArgs, instruct('ret')]
+        } else {
+            return [
+                ...pushArgs,
+                instruct('load', { key: this.id.name }),
+                instruct('invoke'),
+            ];
+        }
     }
 }
