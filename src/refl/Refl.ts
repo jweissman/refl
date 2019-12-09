@@ -7,6 +7,7 @@ import { ReflContext } from './ReflContext';
 import chalk from 'chalk';
 import { ReflNil } from './core/ReflNil';
 import ReflReturn from './core/ReflReturn';
+import { ReflInterpreter } from './ReflInterpreter';
 
 export default class Refl {
     static tracedOutput: string[] = []
@@ -26,12 +27,17 @@ export default class Refl {
 
     context: ReflContext = new ReflContext();
 
+    // TODO see https://nodejs.org/api/repl.html#repl_recoverable_errors
+    // for handling multi-line input (if we hit a syntax error, could assume we may need more input?)
     interpret(input: string) {
+        // let interpreter = new ReflInterpreter();
         if (input.trim().length === 0) { return; }
         let match = Grammar.match(input.trim());
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
             try {
+                // debugger;
+                // return interpreter.run(semanteme.tree.instructions).toJS();
                 let value: ReflObject = semanteme.eval()[0];
                 return value.toJS();
             } catch(e) {
@@ -46,7 +52,6 @@ export default class Refl {
 
     repl() {
         const clear = require('clear');
-        const chalk = require('chalk');
         const figlet = require('figlet');
         const repl = require('repl');
         clear();

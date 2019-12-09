@@ -12,7 +12,6 @@ import { ConditionalExpression } from './ConditionalExpression';
 import { UnaryExpression } from './UnaryExpression';
 import { LogicalExpression } from './LogicalExpression';
 import { Program } from './Program';
-import chalk from 'chalk';
 
 const semantics: Semantics = Grammar.createSemantics();
 
@@ -30,11 +29,14 @@ const tree = {
     Defun_one: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, body.tree),
 
-    Defun_multi: (args: Node, block: Node): FunctionLiteral =>
+    Defun_multi: (args: Node, _arrow: Node, block: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, block.tree),
 
     Block: (_lb: Node, body: Node, _rb: Node) =>
         new Program(body.tree),
+
+    FunctionBody: (_lb: Node, body: Node, _rb: Node) =>
+        new Program(body.tree, true),
 
     Conditional_ternary: (
         test: Node, _q: Node, left: Node, _col: Node, right: Node

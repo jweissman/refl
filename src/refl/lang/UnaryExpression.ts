@@ -1,8 +1,9 @@
 import { assertNever } from 'assert-never';
 import { ReflObject } from '../core/ReflObject';
-import { ReflNode } from './ReflNode';
+import { ReflNode, ReflProgram } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 import { UnaryOperator } from './UnaryOperator';
+import { instruct } from 'myr';
 export class UnaryExpression extends ReflNode {
     constructor(public unOp: UnaryOperator, public operand: ReflNode) { super(); }
     evaluate(ctx: ReflContext): ReflObject {
@@ -23,5 +24,15 @@ export class UnaryExpression extends ReflNode {
             default: assertNever(this.unOp);
         }
         return message as string;
+    }
+
+    // todo enable other ops?
+    prelude() { return []; }
+    get instructions(): ReflProgram {
+        // let opMap = { '!': 'not', '-': 'negate', '()': 'noop' }
+        return [
+            ...this.operand.instructions,
+            instruct('noop'), //{ op: 'noop' } //opMap[this.unOp] }
+        ];
     }
 }

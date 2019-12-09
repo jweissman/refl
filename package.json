@@ -4,7 +4,6 @@
   "private": true,
   "bin": {
     "refl": "./bin/index.ts"
-
   },
   "dependencies": {
     "@types/jest": "^24.0.23",

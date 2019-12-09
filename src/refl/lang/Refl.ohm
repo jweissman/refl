@@ -14,6 +14,7 @@ Refl {
       | CmpExpr
 
 	  Block = "{" Program "}"
+    FunctionBody = "{" Program "}"
 
     Conditional
       = Expr "?" Expr ":" Expr -- ternary
@@ -22,7 +23,7 @@ Refl {
  
     Defun
       = FunArgs "=>" Expr -- one
-      | FunArgs Block -- multi
+      | FunArgs "=>"? FunctionBody -- multi
     
     FunArgs
       = "(" ListOf<ident, ","> ")"
