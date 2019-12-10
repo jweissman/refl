@@ -6,9 +6,6 @@ import { UnaryOperator } from './UnaryOperator';
 import { instruct, OpCode } from 'myr';
 export class UnaryExpression extends ReflNode {
     constructor(public unOp: UnaryOperator, public operand: ReflNode) { super(); }
-    evaluate(ctx: ReflContext): ReflObject {
-        return this.operand.evaluate(ctx).send(this.operation, []);
-    }
     private get operation(): string {
         let message;
         switch (this.unOp) {

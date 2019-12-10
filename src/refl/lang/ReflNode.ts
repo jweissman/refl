@@ -13,7 +13,7 @@ export type ReflProgram = ReflInstruction[];
 
 export abstract class ReflNode {
 
-    abstract evaluate(ctx: ReflContext): ReflObject;
+    // abstract evaluate(ctx: ReflContext): ReflObject;
     abstract get instructions(): ReflProgram;
     abstract prelude(preludeContext: PreludeContext): ReflProgram;
 

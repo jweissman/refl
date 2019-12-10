@@ -8,12 +8,6 @@ import { BinaryOperator } from './BinaryOperator';
 export class BinaryExpression extends ReflNode {
     constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) { super(); }
 
-    evaluate(ctx: ReflContext): ReflObject {
-        let left = this.left.evaluate(ctx);
-        let right = this.right.evaluate(ctx);
-        return left.send(this.operation, [right]);
-    }
-
     prelude() { return []; }
     get instructions(): ReflProgram {
         let opMap: { [key in BinaryOperator]: OpCode } = {

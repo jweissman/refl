@@ -10,24 +10,6 @@ export class FunctionInvocation extends ReflNode {
         super();
     }
 
-    evaluate(ctx: ReflContext): ReflObject {
-        let fnName = this.id.name;
-        let params = this.paramList.map(param => param.evaluate(ctx));
-        let builtin = Refl.builtins[fnName];
-        if (builtin) {
-            return builtin(...params);
-        }
-        else {
-            let fn = ctx.retrieve(this.id.name);
-            let fnCtx = ctx.clone();
-            let args = fn.args.map((e: string, i: number) => [e, params[i]]);
-            args.forEach(([arg, param]: [string, ReflObject]) => {
-                fnCtx.assign(arg, param);
-            });
-            return fn.body.evaluate(fnCtx);
-        }
-    }
-
     prelude() { return []; }
     get instructions(): ReflProgram {
         
@@ -44,8 +26,8 @@ export class FunctionInvocation extends ReflNode {
                 param => param.instructions
             );
  
-
             // handle return here, that should be okay right? :D
+            // note: almost certainly better as keyword...
             return [...pushArgs, instruct('ret')]
         } else {
             let pushArgs: ReflProgram = this.paramList.reverse().flatMap(

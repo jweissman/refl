@@ -19,7 +19,7 @@ const stripMain = (program: ReflProgram) => {
     return program.map(instruction => {
         if (instruction.label) {
             if (instruction.label === 'main') {
-                console.log("FOUND old main instruction label", instruction.label)
+                // console.log("FOUND old main instruction label", instruction.label)
                 return instruct('noop')
             }
         }

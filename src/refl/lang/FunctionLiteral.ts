@@ -60,7 +60,7 @@ export class FunctionLiteral extends ReflNode {
             ...this.body.instructions,
             instruct('ret'),
         ];
-        console.log("COMPILED FN", { args: this.args, body: this.body, result })
+        // console.log("COMPILED FN", { args: this.args, body: this.body, result })
         return result;
     }
 

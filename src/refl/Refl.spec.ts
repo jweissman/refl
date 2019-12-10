@@ -103,7 +103,7 @@ describe(Refl, () => {
             expect(refl.interpret("quadruple(24)")).toEqual(96)
         })
 
-        xit('closes around known values at definition time', () => {
+        it('closes around known values at definition time', () => {
             refl.interpret("x=123") //).toEqual('x')
             refl.interpret('c=()=>x') //).toEqual('c')
             expect(refl.interpret('c()')).toEqual(123)
@@ -223,11 +223,21 @@ describe(Refl, () => {
             expect(refl.interpret("fact(7)")).toEqual(5040)
         })
 
-        test.todo('iteration with while/until')
+        it('iteration with while', () => {
+            refl.interpret("i=1; while (i<4) { print(i); i=i+1 }")
+            expect(Refl.tracedOutput).toEqual([1,2,3])
+        })
+
+        test.todo('iteration with until')
         test.todo('iteration with for')
+        test.todo('iteration with upto/downto')
     })
 
-    test.todo("string lit")
+    it("string lit", () => {
+        refl.interpret("subj='world'")
+        refl.interpret("print('hello ' + subj)")
+        expect(Refl.tracedOutput).toEqual(['hello world']);
+    })
 
     test.todo("array lit")
 

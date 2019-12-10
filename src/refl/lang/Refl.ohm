@@ -11,6 +11,7 @@ Refl {
       = Assignment
       | Defun
       | Conditional
+      | While
       | CmpExpr
 
 	  Block = "{" Program "}"
@@ -20,7 +21,11 @@ Refl {
       = Expr "?" Expr ":" Expr -- ternary
       | "if" "(" Expr ")" Block "else" Block -- if_else
       | "if" "(" Expr ")" Block -- if
- 
+
+    While
+     = "while" "(" Expr ")" Block 
+
+
     Defun
       = FunArgs "=>" Expr -- one
       | FunArgs "=>"? FunctionBody -- multi
@@ -66,9 +71,14 @@ Refl {
       | "-" PriExpr -- neg 
       | ident
       | number
+      | StringLit
     
     Funcall
       = ident "(" ListOf<Expr, ","> ")"
+
+    StringLit
+      = "'" #(~"'" any)* "'" -- single
+      // | "\"" #(~"\"" any)* "\"" -- double
 
     ident
       = letter alnum*
@@ -76,9 +86,8 @@ Refl {
     number
       = digit+
 
-  comment
+    comment
       = #"#" #(~"\n" any)* "\n"?
 
-	space += comment  
-    
+	  space += comment  
 }

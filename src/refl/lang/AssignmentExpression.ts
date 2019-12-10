@@ -11,13 +11,6 @@ export class AssignmentExpression extends ReflNode {
         super();
     }
 
-    evaluate(ctx: ReflContext): ReflObject {
-        let slot = this.left.name;
-        let value = this.right.evaluate(ctx);
-        ctx.assign(slot, value);
-        return new ReflString(slot);
-    }
-
     prelude(ctx: PreludeContext) { return this.right.prelude(ctx); }
 
     get instructions(): ReflProgram {

@@ -17,19 +17,4 @@ export class Program extends ReflNode {
     constructor(public lines: ReflNode[], private isFunction: boolean = false) {
         super();
     }
-
-    evaluate(ctx: ReflContext): ReflObject {
-        let result = null;
-        for (const line of this.lines) {
-            result = line.evaluate(ctx);
-            // if (result instanceof ReflReturn) {
-            //     if (this.isFunction) {
-            //         return result.wrapped;
-            //     } else { 
-            //         return result;
-            //     }
-            // }
-        }
-        return result || new ReflNil();
-    }
 }

@@ -24,7 +24,7 @@ const evaluate = (input: string) => {
     return result; //.toJS()
 }
 
-describe(ReflInterpreter, () => {
+xdescribe(ReflInterpreter, () => {
     describe('arithmetic expressions', () => {
         it('binary operations', () => {
             expect(evaluate('2+2')).toEqual(4);

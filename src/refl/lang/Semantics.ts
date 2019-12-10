@@ -12,6 +12,8 @@ import { ConditionalExpression } from './ConditionalExpression';
 import { UnaryExpression } from './UnaryExpression';
 import { LogicalExpression } from './LogicalExpression';
 import { Program } from './Program';
+import { StringLiteral } from './StringLiteral';
+import WhileExpression from './WhileExpression';
 
 const semantics: Semantics = Grammar.createSemantics();
 
@@ -37,6 +39,11 @@ const tree = {
 
     FunctionBody: (_lb: Node, body: Node, _rb: Node) =>
         new Program(body.tree, true),
+   //      = "while" "(" Expr ")" Block
+ 
+    While: (_while: Node, _lp: Node, test: Node, _rp: Node, block: Node): WhileExpression => {
+        return new WhileExpression(test.tree, block.tree)
+    },
 
     Conditional_ternary: (
         test: Node, _q: Node, left: Node, _col: Node, right: Node
@@ -100,6 +107,10 @@ const tree = {
     
     PriExpr_parens: (_lp: Node, pri: Node, _rp: Node) => {
         return new UnaryExpression('()', pri.tree);
+    },
+
+    StringLit_single: (_lq: Node, content: Node, _rq: Node) => {
+        return new StringLiteral(content.sourceString);
     },
 
     number: (element: Node): NumberLiteral =>

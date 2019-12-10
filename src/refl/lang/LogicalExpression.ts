@@ -11,19 +11,9 @@ export class LogicalExpression extends ReflNode {
     }
 
     get instructions(): ReflProgram {
-        // throw new Error("Method not implemented.");
         let strategy: { [key in LogicalOperator]: ReflProgram } = {
             '&&': [instruct('and')],
             '||': [instruct('or')],
-            // '!':  [instruct('not')],
-            // '!': 'not',
-            // '-': [
-            //     instruct('dup'),
-            //     instruct('push', {value: 2}),
-            //     instruct('mul'),
-            //     instruct('sub'),
-            //  ], // 'negate',
-            // '()': [instruct('noop')]
         }
         return [
             ...this.left.instructions,
@@ -37,11 +27,6 @@ export class LogicalExpression extends ReflNode {
         return [];
     }
 
-    evaluate(ctx: ReflContext): ReflObject {
-        let left = this.left.evaluate(ctx);
-        let right = this.right.evaluate(ctx);
-        return left.send(this.operation, [right]);
-    }
     private get operation(): string {
         let message;
         switch (this.logOp) {

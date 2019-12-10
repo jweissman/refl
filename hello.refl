@@ -5,10 +5,13 @@ fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
 echo = (x) => print(x,fib(x));
 # until(echo, 0, 13) # loop until...
 
-echo(14);
-echo(15);
-echo(16);
-echo(17);
-echo(18);
-echo(19);
-echo(20);
+i = 0;
+n = 35;
+while (i<n) { i=i+1; echo(i); }
+
+# echo(15);
+# echo(16);
+# echo(17);
+# echo(18);
+# echo(19);
+# echo(20);
