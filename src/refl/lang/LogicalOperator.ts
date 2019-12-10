@@ -1,1 +1,1 @@
-export type LogicalOperator = '&&' | '||';
+export type LogicalOperator = '&&' | '||'; // | '!';

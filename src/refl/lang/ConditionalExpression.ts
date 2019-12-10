@@ -24,14 +24,17 @@ export class ConditionalExpression extends ReflNode {
                 instruct('push', { value: true }),
                 instruct('cmp'),
                 instruct('jump_if_zero', {target: `${this.label}-truthy`}),
+                instruct('pop'),
                 instruct('noop', { label: `${this.label}-falsy`}),
                 ...(this.right ? this.right.instructions : []),
                 instruct('jump', { target: `${this.label}-done`}),
                 instruct('noop', { label: `${this.label}-truthy`}),
+                instruct('pop'),
                 ...this.left.instructions,
                 instruct('noop', { label: `${this.label}-done`}),
             ]
         } else {
+            console.trace("missing cond label?")
             throw new Error("No label for conditional -- prelude not run?");
         }
     }

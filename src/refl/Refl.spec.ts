@@ -115,6 +115,10 @@ describe(Refl, () => {
             Refl.tracedOutput = []
             refl.interpret('print(123)');
             expect(Refl.tracedOutput).toEqual([123]);
+
+            Refl.tracedOutput = []
+            refl.interpret('print(1,2,3)');
+            expect(Refl.tracedOutput).toEqual([1,2,3]);
         })
     })
 
@@ -140,39 +144,44 @@ describe(Refl, () => {
             expect(refl.interpret('2 <= 3')).toEqual(true);
         });
 
-        xit('ternaries', () => {
+        it('ternaries', () => {
             refl.interpret('burj=2717') 
             refl.interpret('wt=1776')
             expect(refl.interpret('burj>wt ? 1 : 0')).toEqual(1)
         })
 
-        xdescribe('conditionals with if/else', () => {
+        describe('conditionals with if/else', () => {
             it('given test is positive, activates the left branch', () => {
-                refl.interpret('if (true) { print(1); } else { print(-1); }')
+                refl.interpret('if (1>0) { print(1); } else { print(-1); }')
                 expect(Refl.tracedOutput).toEqual([1]);
             });
 
             it('given test is negative, activates the right branch', () => {
-                refl.interpret('if (false) { print(1); } else { print(-1); }')
+                refl.interpret('if (1<0) { print(1); } else { print(-1); }')
                 expect(Refl.tracedOutput).toEqual([-1]);
             });
         });
 
-        xdescribe('conditions with only if', () => {
+        describe('conditions with only if', () => {
             it('given test is positive, activates the branch', () => {
-                refl.interpret('if (true) { print(1); }')
+                refl.interpret('if (1>0) { print(1); }')
                 expect(Refl.tracedOutput).toEqual([1]);
             });
 
             it('given test is negative, activates the right branch', () => {
-                refl.interpret('if (false) { print(1); }')
+                refl.interpret('if (0>1) { print(1); }')
                 expect(Refl.tracedOutput).toEqual([]);
             });
         })
 
         test.todo('conditionals with unless/else')
 
-        xdescribe("boolean algebra", () => {
+        describe("boolean algebra", () => {
+            it('true/false', () => {
+                expect(refl.interpret("true")).toEqual(true)
+                expect(refl.interpret("false")).toEqual(false)
+            })
+
             it('and', () => {
                 expect(refl.interpret("true && true")).toEqual(true)
                 expect(refl.interpret("true && false")).toEqual(false)
@@ -189,12 +198,22 @@ describe(Refl, () => {
             });
 
             // not - !
-            it('or', () => {
+            it('not', () => {
                 expect(refl.interpret("!true")).toEqual(false)
                 expect(refl.interpret("!false")).toEqual(true)
                 expect(refl.interpret("!!true")).toEqual(true)
                 expect(refl.interpret("!!false")).toEqual(false)
             });
+        })
+
+        it('recursion', () => {
+            refl.interpret("fib=(n)=>n<3?1:fib(n-1)+fib(n-2)")
+            expect(refl.interpret("fib(1)")).toEqual(1)
+            expect(refl.interpret("fib(2)")).toEqual(1)
+            expect(refl.interpret("fib(3)")).toEqual(2)
+            expect(refl.interpret("fib(4)")).toEqual(3)
+            expect(refl.interpret("fib(5)")).toEqual(5)
+            expect(refl.interpret("fib(6)")).toEqual(8)
         })
 
         test.todo('iteration with while/until')

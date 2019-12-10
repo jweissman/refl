@@ -8,7 +8,14 @@
 #    }
 # }
 
-fib = (n) => n <= 1 ? 1 : fib(n-1) + fib(n-2);
-forever = (f,i) { f(i); forever(f, i+1) };
-loop = (x) => print(x,fib(x));
-forever(loop,0) # loop forever
+fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
+# print(fib(1))
+# print(fib(2))
+# print(fib(3))
+# print(fib(4))
+# print(fib(5))
+# print(fib(6))
+
+until = (f,i,n) { f(i); if (i<n) { until(f,i+1,n); } }
+echo = (x) => print(x,fib(x));
+until(echo, 0, 13) # loop until...

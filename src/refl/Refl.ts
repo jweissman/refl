@@ -6,7 +6,6 @@ import { ReflContext } from './ReflContext';
 
 import chalk from 'chalk';
 import { ReflNil } from './core/ReflNil';
-// import ReflReturn from './core/ReflReturn';
 import { ReflInterpreter } from './ReflInterpreter';
 
 export default class Refl {
@@ -36,13 +35,11 @@ export default class Refl {
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
             try {
-                // debugger;
-                // return interpreter.run(semanteme.tree.instructions).toJS();
                 let value: ReflObject = 
                     this.interpreter.run(semanteme.tree);
-                    // semanteme.eval()[0];
-                return value.toJS();
+                return value;
             } catch(e) {
+                // console.trace(e);
                 console.log(chalk.red("Error: " + e.message));
             }
         } else {

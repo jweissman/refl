@@ -1,11 +1,10 @@
 import { assertNever } from 'assert-never';
+import { OpCode, instruct } from 'myr';
 import { ReflObject } from '../core/ReflObject';
 import { ReflNode, ReflProgram } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 import { BinaryOperator } from './BinaryOperator';
-import { OpCode, Instruction, instruct } from 'myr';
 
-// import { Instruction, ReflInstruction, OpCode } from '../ReflInterpreter';
 export class BinaryExpression extends ReflNode {
     constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) { super(); }
 
@@ -17,20 +16,17 @@ export class BinaryExpression extends ReflNode {
 
     prelude() { return []; }
     get instructions(): ReflProgram {
-        let opMap: { [key: string]: OpCode } = {
-            '+': 'add', '-': 'sub', '*': 'mul', '/': 'div', 
-            // todo test exponentiation
+        let opMap: { [key in BinaryOperator]: OpCode } = {
+            '+': 'add',
+            '-': 'sub',
+            '*': 'mul',
+            '/': 'div', 
             '^': 'pow'
         }
         return [
             ...this.left.instructions,
             ...this.right.instructions,
             instruct(opMap[this.op]),
-            // pop the operands, leaving the result?
-            // instruct('swap'),
-            // instruct('pop'),
-            // instruct('swap'),
-            // instruct('pop'),
         ]
     }
 

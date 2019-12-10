@@ -1,5 +1,5 @@
 import { ReflObject } from '../core/ReflObject';
-import { ReflNode } from './ReflNode';
+import { ReflNode, ReflProgram } from './ReflNode';
 import { ReflContext } from "../ReflContext";
 // import { ReflInstruction } from '../ReflInterpreter';
 import { ReflString } from '../core/ReflString';
@@ -19,8 +19,7 @@ export class Identifier extends ReflNode {
     }
 
     prelude() { return []; }
-    get instructions(): Instruction<number>[] {
-        let instruction: Instruction<number> = instruct('load', { key: this.name })
-        return [instruction];
+    get instructions(): ReflProgram {
+        return [instruct('load', { key: this.name })];
     }
 }

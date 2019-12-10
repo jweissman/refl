@@ -11,7 +11,12 @@ export class FunctionLiteral extends ReflNode {
         super();
     }
 
+    // TODO not enough for dynamically constructed lambdas
+    // (will need to gen code on-the-fly i think?)
     prelude(ctx: PreludeContext): ReflProgram {
+        // prelude method body...?
+        this.body.prelude(ctx);
+
         this.label = ctx.nextAnonymousFunctionLabel();
         let storeArgs: ReflProgram = this.args.flatMap((arg) => [
             instruct('store', { key: arg }),
@@ -25,14 +30,15 @@ export class FunctionLiteral extends ReflNode {
         ]
     }
 
-    get instructions(): Instruction<number | string>[] {
+    get instructions(): ReflProgram {
         if (!this.label) {
             throw new Error("function literal wasn't prelude'd, so no label?")
         }
-
+        let value = this.label;
         return [
+            instruct('push', { value })
             // some kind of hint here?
-            { op: 'push', value: this.label }, // } //new ReflFunction(this.args, this.body) }
+            // { op: 'push', value: this.label }, // } //new ReflFunction(this.args, this.body) }
             // just push the value of the fn???
             // we don't even have a label to WRITE in this case :/
             // { op: 'label', value: }

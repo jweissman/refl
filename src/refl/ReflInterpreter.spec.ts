@@ -18,10 +18,10 @@ const parse = (input: string) => {
 
 let interpreter = new ReflInterpreter();
 const evaluate = (input: string) => {
-    console.log(chalk.green("EVALUATE: ") + chalk.yellow(input))
+    // console.log(chalk.green("EVALUATE: ") + chalk.yellow(input))
     let program: ReflNode[] = parse(input);
     let result = interpreter.run(program);
-    return result.toJS()
+    return result; //.toJS()
 }
 
 describe(ReflInterpreter, () => {

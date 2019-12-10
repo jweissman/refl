@@ -3,12 +3,13 @@ import { ReflContext } from '../ReflContext';
 import { Instruction } from 'myr';
 // import { Instruction, ReflInstruction } from '../ReflInterpreter';
 
-export type ReflInstruction = Instruction<number | string | boolean>;
-export type ReflProgram = ReflInstruction[];
 export type PreludeContext = {
     nextAnonymousFunctionLabel: Function,
     nextConditionalLabel: Function,
 }
+
+export type ReflInstruction = Instruction;
+export type ReflProgram = ReflInstruction[];
 
 export abstract class ReflNode {
     abstract evaluate(ctx: ReflContext): ReflObject;

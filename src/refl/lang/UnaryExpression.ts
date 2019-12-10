@@ -29,8 +29,8 @@ export class UnaryExpression extends ReflNode {
     // todo enable other ops?
     prelude() { return []; }
     get instructions(): ReflProgram {
-        let strategy: {[key: string]: ReflProgram} = {
-            // '!': 'not',
+        let strategy: {[key in UnaryOperator]: ReflProgram} = {
+            '!': [instruct('not')],
             '-': [
                 instruct('dup'),
                 instruct('push', {value: 2}),
