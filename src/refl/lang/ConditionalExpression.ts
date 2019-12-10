@@ -5,38 +5,41 @@ import { ReflNil } from '../core/ReflNil';
 // import ReflReturn from '../core/ReflReturn';
 import { instruct } from 'myr';
 
+let conds = 0;
 export class ConditionalExpression extends ReflNode {
-    private label: string | undefined;
+    // private label: string | undefined;
     constructor(public test: ReflNode, public left: ReflNode, public right?: ReflNode) {
         super();
     }
 
     prelude(ctx: PreludeContext) {
-        this.label = ctx.nextConditionalLabel();
+        // this.label = ctx.nextConditionalLabel();
         return [];
     }
 
+    // now instructions need ctx...
     get instructions(): ReflProgram {
-        if (this.label) {
+        let label = `cond-${conds++}`;
+        // if (this.label) {
             return [
-                instruct('noop', { label: `${this.label}-test`}),
+                instruct('noop', { label: `${label}-test`}),
                 ...this.test.instructions,
                 instruct('push', { value: true }),
                 instruct('cmp'),
-                instruct('jump_if_zero', {target: `${this.label}-truthy`}),
+                instruct('jump_if_zero', {target: `${label}-truthy`}),
                 instruct('pop'),
-                instruct('noop', { label: `${this.label}-falsy`}),
+                instruct('noop', { label: `${label}-falsy`}),
                 ...(this.right ? this.right.instructions : []),
-                instruct('jump', { target: `${this.label}-done`}),
-                instruct('noop', { label: `${this.label}-truthy`}),
+                instruct('jump', { target: `${label}-done`}),
+                instruct('noop', { label: `${label}-truthy`}),
                 instruct('pop'),
                 ...this.left.instructions,
-                instruct('noop', { label: `${this.label}-done`}),
+                instruct('noop', { label: `${label}-done`}),
             ]
-        } else {
-            console.trace("missing cond label?")
-            throw new Error("No label for conditional -- prelude not run?");
-        }
+        // } else {
+        //     console.trace("missing cond label?")
+        //     throw new Error("No label for conditional -- prelude not run?");
+        // }
     }
 
     evaluate(ctx: ReflContext): ReflObject {

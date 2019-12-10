@@ -7,6 +7,7 @@ import { ReflContext } from './ReflContext';
 import chalk from 'chalk';
 import { ReflNil } from './core/ReflNil';
 import { ReflInterpreter } from './ReflInterpreter';
+import { prettyProgram } from 'myr';
 
 export default class Refl {
     interpreter = new ReflInterpreter();
@@ -14,37 +15,31 @@ export default class Refl {
 
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
-            // let output = args.map(arg => arg.value);
             console.log(chalk.bgBlue(chalk.whiteBright(args)));
             Refl.tracedOutput.push(...args);
             return new ReflNil();
         },
-
-        // "return": (object: ReflObject) => {
-        //     return new ReflReturn(object);
-        // }
     }
 
     context: ReflContext = new ReflContext();
 
-    // TODO see https://nodejs.org/api/repl.html#repl_recoverable_errors
-    // for handling multi-line input (if we hit a syntax error, could assume we may need more input?)
     interpret(input: string) {
         if (input.trim().length === 0) { return; }
         let match = Grammar.match(input.trim());
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
             try {
-                let value: ReflObject = 
-                    this.interpreter.run(semanteme.tree);
+                let value = this.interpreter.run(semanteme.tree);
+                // this.interpreter.interpreter.machine.pop();
                 return value;
             } catch(e) {
-                // console.trace(e);
+                console.log("NAME OF ERR: '" + e.name + "'");
                 console.log(chalk.red("Error: " + e.message));
             }
         } else {
             console.debug(chalk.blue(match.message))
-            console.log(chalk.red("Syntax error found at " + match.shortMessage))
+            throw new SyntaxError(match.shortMessage)
+            // console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
         return '...';
     }
@@ -56,12 +51,29 @@ export default class Refl {
         clear();
         console.log(chalk.green(figlet.textSync('refl')))
         console.log("\n" + chalk.blue("Refl") + chalk.gray("Repl"));
-        repl.start({
+        const server = repl.start({
             prompt: "\n(refl) ",
             eval: (input: string, _ctx: any, _filename: any, cb: any) => {
-                const out = this.interpret(input) || 'nil';
+                let out = '(nothing)';
+                try {
+                    out = this.interpret(input) || '(no-result)';
+                } catch (e) {
+                    if (e.name === 'SyntaxError') {
+                        return cb(new repl.Recoverable(e))
+                    }
+                }
                 if (out) { cb(null, out) };
             }
+        })
+
+        server.defineCommand('code', {
+            help: 'Echo current program instructions',
+            action: () => { console.log(prettyProgram(this.interpreter.interpreter.code)) }
+        })
+
+        server.defineCommand('stack', {
+            help: 'Echo current program instructions',
+            action: () => { console.log(this.interpreter.interpreter.machine.stack) }
         })
 
     }

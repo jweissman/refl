@@ -1,21 +1,14 @@
 # hello.refl
 
-# fib = (n) => {
-#    if (n < 2) {
-#        return(1)
-#    } else {
-#        return(fib(n-1) + fib(n-2))
-#    }
-# }
-
 fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
-# print(fib(1))
-# print(fib(2))
-# print(fib(3))
-# print(fib(4))
-# print(fib(5))
-# print(fib(6))
-
-until = (f,i,n) { f(i); if (i<n) { until(f,i+1,n); } }
+# until = (f,i,n) { f(i); if (i<n) { until(f,i+1,n); } }
 echo = (x) => print(x,fib(x));
-until(echo, 0, 13) # loop until...
+# until(echo, 0, 13) # loop until...
+
+echo(14);
+echo(15);
+echo(16);
+echo(17);
+echo(18);
+echo(19);
+echo(20);

@@ -94,12 +94,13 @@ describe(Refl, () => {
             expect(refl.interpret("pow(2,8)")).toEqual(256)
         })
 
-        xit('higher order functions', () => {
+        it('higher order functions', () => {
+            // okay, this needs to create a closure...?
             refl.interpret("twice=(f)=>(x)=>f(f(x))")
             refl.interpret("double=(x)=>x*2")
             refl.interpret("quadruple=twice(double)")
             expect(refl.interpret("quadruple(5)")).toEqual(20)
-            expect(refl.interpret("quadruple(24)")).toEqual(92)
+            expect(refl.interpret("quadruple(24)")).toEqual(96)
         })
 
         xit('closes around known values at definition time', () => {
@@ -214,6 +215,12 @@ describe(Refl, () => {
             expect(refl.interpret("fib(4)")).toEqual(3)
             expect(refl.interpret("fib(5)")).toEqual(5)
             expect(refl.interpret("fib(6)")).toEqual(8)
+            expect(refl.interpret("fib(7)")).toEqual(13)
+            expect(refl.interpret("fib(8)")).toEqual(21)
+
+            refl.interpret("fact=(n)=>n<2?1:n*fact(n-1)")
+            expect(refl.interpret("fact(5)")).toEqual(120)
+            expect(refl.interpret("fact(7)")).toEqual(5040)
         })
 
         test.todo('iteration with while/until')
