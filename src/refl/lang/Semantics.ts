@@ -17,6 +17,8 @@ import { ClassDefinition } from './ClassDefinition';
 import { DotAccess } from './DotAccess';
 import { ArrayLiteral } from './ArrayLiteral';
 import { ArrayLookup } from './ArrayLookup';
+import { HashLiteral } from './HashLiteral';
+import { KeyValuePair } from './KeyValuePair';
 
 const semantics: Semantics = Grammar.createSemantics();
 
@@ -129,6 +131,14 @@ const tree = {
 
     StringLit: (_lq: Node, content: Node, _rq: Node) => {
         return new StringLiteral(content.sourceString);
+    },
+
+    HashLit: (_lb: Node, kvPairs: Node, _rb: Node) => {
+        return new HashLiteral(kvPairs.tree);
+    },
+
+    KeyValuePair: (id: Node, _col: Node, value: Node) =>{
+        return new KeyValuePair(id.tree, value.tree);
     },
 
     ArrayLit: (_lb: Node, elements: Node, _rb: Node) => {

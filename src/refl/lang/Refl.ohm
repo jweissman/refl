@@ -10,7 +10,6 @@ Refl {
       | Defun
       | Defclass
       | While
-      | DotAccess
       | CmpExpr
 
 	  Block = "{" Program "}"
@@ -45,8 +44,8 @@ Refl {
       | LogExpr
     
     LogExpr
-      = LogExpr "||" AddExpr -- or 
-      | LogExpr "&&" AddExpr -- and
+      = LogExpr "||" LogExpr -- or 
+      | LogExpr "&&" LogExpr -- and
       | "!" LogExpr -- not
       | AddExpr
     
@@ -68,12 +67,20 @@ Refl {
       = 
       | "(" Expr ")" -- parens
       | "-" PriExpr -- neg 
+      | DotAccess
       | ArrayIndex
-	    | Funcall
+  	  | Funcall
       | ArrayLit
       | StringLit
+      | HashLit
       | ident
       | number
+    
+    HashLit
+      = "{" ListOf<KeyValuePair, ","> "}"
+    
+    KeyValuePair
+      = ident ":" Expr
       
     ArrayLit
       = "[" ListOf<Expr, ","> "]"
@@ -84,8 +91,8 @@ Refl {
       = ident "(" ListOf<Expr, ","> ")"
 
     DotAccess
-      = Expr "." Funcall -- method
-      | Expr "." ident -- property
+      = (DotAccess | ident) "." Funcall -- method
+      | (DotAccess | ident) "." ident -- property
 
     StringLit
       = "'" #(~"'" any)* "'"

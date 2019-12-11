@@ -1,5 +1,5 @@
 import { ReflNode, ReflProgram } from './lang/ReflNode';
-import { Interpreter, SimpleAlgebra, instruct, MyrBoolean, prettyProgram } from 'myr';
+import { Interpreter, SimpleAlgebra, instruct, MyrBoolean, prettyProgram, MyrNil } from 'myr';
 import { Compiler } from 'myr/src/myr/vm/Interpreter';
 
 let integerAlgebra = new SimpleAlgebra();
@@ -29,6 +29,7 @@ export class ReflInterpreter extends Interpreter<ReflNode> {
         super(integerAlgebra, compiler);
         this.db.put("true", new MyrBoolean(true));
         this.db.put("false", new MyrBoolean(false));
+        this.db.put("nil", new MyrNil());
     }
 
     get activeProgram(): ReflProgram {

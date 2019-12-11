@@ -1,6 +1,20 @@
 # hello.refl
 
-fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
+fmemo = []
+
+fib = (n) => n < 2 ? 1 : (fibm(n-1) + fibm(n-2));
+
+fibm(n) {
+    print(n, fmemo)
+    if (fmemo[fib] == nil) {
+        result = fib(n)
+        fmemo[fib] = result
+        return(result)
+    } else {
+        return(fmemo[fib])
+    }
+}
+
 # until = (f,i,n) { f(i); if (i<n) { until(f,i+1,n); } }
 echo = (x) => print(x,fib(x));
 # until(echo, 0, 13) # loop until...

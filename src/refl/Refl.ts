@@ -57,9 +57,9 @@ export default class Refl {
                     out = this.interpret(input);
                     if (out === undefined) { out = '(no-result)' };
                 } catch (e) {
-                    if (e.name === 'SyntaxError') {
-                        return cb(new repl.Recoverable(e))
-                    }
+                    // if (e.name === 'SyntaxError') {
+                    //     return cb(new repl.Recoverable(e))
+                    // }
                 }
                 if (out !== undefined) { cb(null, out) };
             }

@@ -265,19 +265,24 @@ describe(Refl, () => {
         expect(refl.interpret('a[0]')).toEqual(10)
         expect(refl.interpret('a[1]')).toEqual(20)
         expect(refl.interpret('a[2]')).toEqual(30)
-        expect(() => refl.interpret('a[3]')).toThrow("array index out of bounds")
+        expect(refl.interpret('a[3]')).toEqual(null) //toThrow("array index out of bounds")
         expect(refl.interpret('a[2]=-1')).toEqual([10,20,-1])
         // expect(refl.interpret('a')).toEqual([10,20,-1])
     });
 
-    it('array manip', ()=> {
+    it('array manip', () => {
         refl.interpret('g=()=>[10,20,30]');
         expect(refl.interpret('g()[2]')).toEqual(30)
         refl.interpret('print(g()[2])')
         expect(Refl.tracedOutput).toEqual([30])
     })
 
-    test.todo("associative arrays")
+    it("associative arrays", () => {
+        refl.interpret("user={name:'John', age:21, scores: [88, 94, 87, 78, 85, 92]}")
+        expect(refl.interpret("user.name")).toEqual("John")
+        expect(refl.interpret("user.age")).toEqual(21)
+        expect(refl.interpret("user.scores")).toEqual([88, 94, 87, 78, 85, 92])
+    })
 
     xit("classes", () => {
         refl.interpret(`
