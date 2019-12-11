@@ -1,18 +1,14 @@
 Refl {
     Program
-      = ListOf<Stmt, StmtDelim?>
-
-    Stmt
-      = Expr StmtDelim? 
-     
-    StmtDelim = #";" | #"\n"
+      = ListOf<Expr, br*> br*
+	  br = ";" | "\n" | "\r"
 
     Expr
       = Assignment
       | Lambda
+      | Conditional
       | Defun
       | Defclass
-      | Conditional
       | While
       | DotAccess
       | CmpExpr
@@ -38,7 +34,7 @@ Refl {
       = "(" ListOf<ident, ","> ")"
     
     Assignment
-      = ident "=" Expr
+      = (ArrayIndex | ident) "=" Expr
 
     CmpExpr
       = LogExpr ">" LogExpr -- gt
@@ -69,12 +65,20 @@ Refl {
       | PriExpr
 
     PriExpr
-      = Funcall
+      = 
       | "(" Expr ")" -- parens
       | "-" PriExpr -- neg 
+      | ArrayIndex
+	    | Funcall
+      | ArrayLit
+      | StringLit
       | ident
       | number
-      | StringLit
+      
+    ArrayLit
+      = "[" ListOf<Expr, ","> "]"
+    
+    ArrayIndex = (Funcall | ArrayIndex | ident) "[" Expr "]"
     
     Funcall
       = ident "(" ListOf<Expr, ","> ")"

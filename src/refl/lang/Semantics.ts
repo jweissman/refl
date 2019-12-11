@@ -15,17 +15,19 @@ import { StringLiteral } from './StringLiteral';
 import WhileExpression from './WhileExpression';
 import { ClassDefinition } from './ClassDefinition';
 import { DotAccess } from './DotAccess';
+import { ArrayLiteral } from './ArrayLiteral';
+import { ArrayLookup } from './ArrayLookup';
 
 const semantics: Semantics = Grammar.createSemantics();
 
 const tree = {
-    Stmt: (e: Node, _delim: Node) => e.tree,
+    Program: (body: Node, _br: Node) => body.tree,
+    Expr: (e: Node) => e.tree,
 
     Defclass: (_class: Node, id: Node, body: Node) => {
         return new AssignmentExpression(id.tree, 
             new ClassDefinition(id.tree, body.tree)
         );
-        // return new ClassDefinition(id.tree, body.tree);
     },
 
     DotAccess_method: (obj: Node, _dot: Node, message: Node) => {
@@ -129,6 +131,14 @@ const tree = {
         return new StringLiteral(content.sourceString);
     },
 
+    ArrayLit: (_lb: Node, elements: Node, _rb: Node) => {
+        return new ArrayLiteral(elements.tree);
+    },
+
+    ArrayIndex: (id: Node, _lb: Node, index: Node, _rb: Node) => {
+        return new ArrayLookup(id.tree, index.tree);
+    },
+
     number: (element: Node): NumberLiteral =>
         new NumberLiteral(Number(element.sourceString)),
 
@@ -145,15 +155,4 @@ const tree = {
 
 
 semantics.addAttribute('tree', tree);
-
-// let globalCtx = new ReflContext();
-// semantics.addOperation('eval', {
-//     Stmt: (e: Node, _delim: Node) => { return e.eval() },
-//     // Expr: (e: Node) => e.tree.evaluate(globalCtx),
-//     NonemptyListOf: (eFirst: Node, _sep: any, eRest: Node) => {
-//         let result = [eFirst.eval(), ...eRest.eval()];
-//         return result;
-//     },
-// });
-
 export default semantics;

@@ -32,6 +32,7 @@ export default class Refl {
             } catch(e) {
                 console.log("NAME OF ERR: '" + e.name + "'");
                 console.log(chalk.red("Error: " + e.message));
+                throw(e);
             }
         } else {
             console.debug(chalk.blue(match.message))
@@ -53,13 +54,14 @@ export default class Refl {
             eval: (input: string, _ctx: any, _filename: any, cb: any) => {
                 let out = '(nothing)';
                 try {
-                    out = this.interpret(input) || '(no-result)';
+                    out = this.interpret(input);
+                    if (out === undefined) { out = '(no-result)' };
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
                         return cb(new repl.Recoverable(e))
                     }
                 }
-                if (out) { cb(null, out) };
+                if (out !== undefined) { cb(null, out) };
             }
         })
 

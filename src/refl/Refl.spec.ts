@@ -89,7 +89,7 @@ describe(Refl, () => {
         })
 
         it("multi-line functions", () => {
-            refl.interpret("pow = (x,y) { x+y; return(x ^ y) }");
+            refl.interpret("pow = (x,y) { x+y; return(x ^ y); }");
             expect(refl.interpret("pow(2,3)")).toEqual(8)
             expect(refl.interpret("pow(2,8)")).toEqual(256)
         })
@@ -173,6 +173,11 @@ describe(Refl, () => {
                 refl.interpret('if (0>1) { print(1); }')
                 expect(Refl.tracedOutput).toEqual([]);
             });
+
+            it('given test is true executes', () => {
+                refl.interpret('if (true) { print(1); }')
+                expect(Refl.tracedOutput).toEqual([1]);
+            });
         })
 
         test.todo('conditionals with unless/else')
@@ -254,15 +259,22 @@ describe(Refl, () => {
         expect(refl.interpret("three()")).toEqual(3)
     })
 
-    xit("array lit", () => {
-        refl.interpret('a=[1,2,3]');
-        expect(refl.interpret('a')).toEqual([1,2,3])
-        expect(refl.interpret('a[0]')).toEqual(1)
-        expect(refl.interpret('a[1]')).toEqual(2)
-        expect(refl.interpret('a[2]')).toEqual(3)
-        expect(refl.interpret('a[3]')).toThrow()
-        expect(refl.interpret('a[2]=-1')).toEqual(-1)
-        expect(refl.interpret('a')).toEqual([1,-1,3])
+    it("array lit", () => {
+        refl.interpret('a=[10,20,30]');
+        expect(refl.interpret('a')).toEqual([10,20,30])
+        expect(refl.interpret('a[0]')).toEqual(10)
+        expect(refl.interpret('a[1]')).toEqual(20)
+        expect(refl.interpret('a[2]')).toEqual(30)
+        expect(() => refl.interpret('a[3]')).toThrow("array index out of bounds")
+        expect(refl.interpret('a[2]=-1')).toEqual([10,20,-1])
+        // expect(refl.interpret('a')).toEqual([10,20,-1])
+    });
+
+    it('array manip', ()=> {
+        refl.interpret('g=()=>[10,20,30]');
+        expect(refl.interpret('g()[2]')).toEqual(30)
+        refl.interpret('print(g()[2])')
+        expect(Refl.tracedOutput).toEqual([30])
     })
 
     test.todo("associative arrays")

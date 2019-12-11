@@ -1,5 +1,5 @@
 import { ReflNode, ReflProgram } from './lang/ReflNode';
-import { Interpreter, SimpleAlgebra, instruct, MyrBoolean } from 'myr';
+import { Interpreter, SimpleAlgebra, instruct, MyrBoolean, prettyProgram } from 'myr';
 import { Compiler } from 'myr/src/myr/vm/Interpreter';
 
 let integerAlgebra = new SimpleAlgebra();

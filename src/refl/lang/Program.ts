@@ -5,7 +5,7 @@ export class Program extends ReflNode {
         return this.lines.flatMap(line => line.instructions)
     }
 
-    constructor(public lines: ReflNode[], private isFunction: boolean = false) {
+    constructor(public lines: ReflNode[]) {
         super();
     }
 }
