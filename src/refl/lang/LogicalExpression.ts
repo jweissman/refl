@@ -1,7 +1,4 @@
-import { assertNever } from 'assert-never';
-import { ReflObject } from '../core/ReflObject';
-import { ReflNode, ReflProgram, PreludeContext } from './ReflNode';
-import { ReflContext } from "../ReflContext";
+import { ReflNode, ReflProgram } from './ReflNode';
 import { LogicalOperator } from './LogicalOperator';
 import { instruct } from 'myr';
 
@@ -21,23 +18,5 @@ export class LogicalExpression extends ReflNode {
             ...strategy[this.logOp],
         ];
 
-    }
-
-    prelude(preludeContext: PreludeContext): ReflProgram {
-        return [];
-    }
-
-    private get operation(): string {
-        let message;
-        switch (this.logOp) {
-            case '&&':
-                message = 'and';
-                break;
-            case '||':
-                message = 'or';
-                break;
-            default: assertNever(this.logOp);
-        }
-        return message as string;
     }
 }

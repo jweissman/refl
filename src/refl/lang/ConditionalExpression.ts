@@ -1,5 +1,5 @@
-import { ReflNode, ReflProgram, PreludeContext } from './ReflNode';
-import { instruct } from 'myr';
+import { ReflNode, ReflProgram } from './ReflNode';
+import { instruct, MyrBoolean } from 'myr';
 
 let conds = 0;
 export class ConditionalExpression extends ReflNode {
@@ -7,16 +7,12 @@ export class ConditionalExpression extends ReflNode {
         super();
     }
 
-    prelude(ctx: PreludeContext) {
-        return [];
-    }
-
     get instructions(): ReflProgram {
         let label = `cond-${conds++}`;
         return [
             instruct('noop', { label: `${label}-test` }),
             ...this.test.instructions,
-            instruct('push', { value: true }),
+            instruct('push', { value: new MyrBoolean(true) }),
             instruct('cmp'),
             instruct('jump_if_zero', { target: `${label}-truthy` }),
             instruct('pop'),

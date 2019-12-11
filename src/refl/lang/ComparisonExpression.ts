@@ -1,12 +1,10 @@
 import { assertNever } from 'assert-never';
-import { ReflObject } from '../core/ReflObject';
-import { ReflNode, ReflProgram, PreludeContext } from './ReflNode';
-import { ReflContext } from "../ReflContext";
+import { ReflNode, ReflProgram } from './ReflNode';
 import { ComparatorOp } from './ComparatorOp';
 import { instruct, OpCode } from 'myr';
 
 export class ComparisonExpression extends ReflNode {
-    constructor(public cmpOp: ComparatorOp, public left: ReflObject, public right: ReflObject) {
+    constructor(public cmpOp: ComparatorOp, public left: ReflNode, public right: ReflNode) {
         super();
     }
 
@@ -16,22 +14,9 @@ export class ComparisonExpression extends ReflNode {
             ...this.left.instructions,
             ...this.right.instructions,
             compare,
-            // instruct('cmp'),
-            // instruct('jump_gt', { value: 0, label: 'gt'})
-            // instruct('jump_lt', { value: 0, label: 'lt'})
-            // instruct('push', { value: 0 }),
-            // instruct('jump', { label: })
         ]
-        throw new Error("Method not implemented.");
     }
 
-    prelude(): ReflProgram { return []; }
-
-    evaluate(ctx: ReflContext): ReflObject {
-        let left = this.left.evaluate(ctx);
-        let right = this.right.evaluate(ctx);
-        return left.send(this.operation, [right]);
-    }
     private get operation(): string {
         let message;
         switch (this.cmpOp) {

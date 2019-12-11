@@ -1,13 +1,10 @@
 import Grammar from './lang/Grammar';
 import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
-import { ReflObject } from './core/ReflObject';
-import { ReflContext } from './ReflContext';
 
 import chalk from 'chalk';
-import { ReflNil } from './core/ReflNil';
 import { ReflInterpreter } from './ReflInterpreter';
-import { prettyProgram } from 'myr';
+import { prettyProgram, MyrNil } from 'myr';
 
 export default class Refl {
     interpreter = new ReflInterpreter();
@@ -15,13 +12,13 @@ export default class Refl {
 
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
-            console.log(chalk.bgBlue(chalk.whiteBright(args)));
-            Refl.tracedOutput.push(...args);
-            return new ReflNil();
+            let printableArgs = args.map(arg => arg !== undefined && arg.toJS())
+            console.log(...printableArgs);
+            // console.log(chalk.bgBlue(chalk.whiteBright(args)));
+            Refl.tracedOutput.push(...printableArgs);
+            return new MyrNil();
         },
     }
-
-    context: ReflContext = new ReflContext();
 
     interpret(input: string) {
         if (input.trim().length === 0) { return; }
@@ -29,7 +26,7 @@ export default class Refl {
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
             try {
-                let value = this.interpreter.run(semanteme.tree);
+                let value = this.interpreter.interpret(semanteme.tree);
                 // this.interpreter.interpreter.machine.pop();
                 return value;
             } catch(e) {
@@ -68,12 +65,12 @@ export default class Refl {
 
         server.defineCommand('code', {
             help: 'Echo current program instructions',
-            action: () => { console.log(prettyProgram(this.interpreter.interpreter.code)) }
+            action: () => { console.log(prettyProgram(this.interpreter.code)) }
         })
 
         server.defineCommand('stack', {
             help: 'Echo current program instructions',
-            action: () => { console.log(this.interpreter.interpreter.machine.stack) }
+            action: () => { console.log(this.interpreter.machine.stack) }
         })
 
     }

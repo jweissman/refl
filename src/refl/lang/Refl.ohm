@@ -9,13 +9,15 @@ Refl {
 
     Expr
       = Assignment
+      | Lambda
       | Defun
+      | Defclass
       | Conditional
       | While
+      | DotAccess
       | CmpExpr
 
 	  Block = "{" Program "}"
-    FunctionBody = "{" Program "}"
 
     Conditional
       = Expr "?" Expr ":" Expr -- ternary
@@ -25,10 +27,12 @@ Refl {
     While
      = "while" "(" Expr ")" Block 
 
+    Defun = ident Lambda
+    Defclass = "class" ident Block
 
-    Defun
+    Lambda
       = FunArgs "=>" Expr -- one
-      | FunArgs "=>"? FunctionBody -- multi
+      | FunArgs "=>"? Block -- multi
     
     FunArgs
       = "(" ListOf<ident, ","> ")"
@@ -67,7 +71,6 @@ Refl {
     PriExpr
       = Funcall
       | "(" Expr ")" -- parens
-      // | "+" PriExpr -- pos 
       | "-" PriExpr -- neg 
       | ident
       | number
@@ -76,9 +79,13 @@ Refl {
     Funcall
       = ident "(" ListOf<Expr, ","> ")"
 
+    DotAccess
+      = Expr "." Funcall -- method
+      | Expr "." ident -- property
+
     StringLit
-      = "'" #(~"'" any)* "'" -- single
-      // | "\"" #(~"\"" any)* "\"" -- double
+      = "'" #(~"'" any)* "'"
+      | "\"" #(~"\"" any)* "\""
 
     ident
       = letter alnum*

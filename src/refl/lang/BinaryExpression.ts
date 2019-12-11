@@ -1,14 +1,13 @@
 import { assertNever } from 'assert-never';
 import { OpCode, instruct } from 'myr';
-import { ReflObject } from '../core/ReflObject';
 import { ReflNode, ReflProgram } from './ReflNode';
-import { ReflContext } from "../ReflContext";
 import { BinaryOperator } from './BinaryOperator';
 
 export class BinaryExpression extends ReflNode {
-    constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) { super(); }
+    constructor(public op: BinaryOperator, public left: ReflNode, public right: ReflNode) {
+        super();
+    }
 
-    prelude() { return []; }
     get instructions(): ReflProgram {
         let opMap: { [key in BinaryOperator]: OpCode } = {
             '+': 'add',
@@ -22,28 +21,5 @@ export class BinaryExpression extends ReflNode {
             ...this.right.instructions,
             instruct(opMap[this.op]),
         ]
-    }
-
-    private get operation(): string {
-        let message;
-        switch (this.op) {
-            case '+':
-                message = 'plus';
-                break;
-            case '-':
-                message = 'minus';
-                break;
-            case '*':
-                message = 'times';
-                break;
-            case '/':
-                message = 'div';
-                break;
-            case '^':
-                message = 'pow';
-                break;
-            default: assertNever(this.op);
-        }
-        return message as string;
     }
 }

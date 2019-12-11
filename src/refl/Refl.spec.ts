@@ -223,29 +223,69 @@ describe(Refl, () => {
             expect(refl.interpret("fact(7)")).toEqual(5040)
         })
 
-        it('iteration with while', () => {
-            refl.interpret("i=1; while (i<4) { print(i); i=i+1 }")
-            expect(Refl.tracedOutput).toEqual([1,2,3])
-        })
+        describe('iteration', () => {
+            it('with while', () => {
+                refl.interpret("i=1; while (i<4) { print(i); i=i+1 }")
+                expect(Refl.tracedOutput).toEqual([1, 2, 3])
+            })
 
-        test.todo('iteration with until')
-        test.todo('iteration with for')
-        test.todo('iteration with upto/downto')
+            test.todo('with until')
+            test.todo('with for')
+            test.todo('with upto/downto')
+        });
     })
 
-    it("string lit", () => {
-        refl.interpret("subj='world'")
-        refl.interpret("print('hello ' + subj)")
-        expect(Refl.tracedOutput).toEqual(['hello world']);
+    describe("string lit", () => {
+        it("single quote", () => {
+            refl.interpret("subj='world'")
+            refl.interpret("print('hello ' + subj)")
+            expect(Refl.tracedOutput).toEqual(['hello world']);
+        });
+
+        it("double quote", () => {
+            refl.interpret("subj=\"user\"")
+            refl.interpret("print('hello ' + subj)")
+            expect(Refl.tracedOutput).toEqual(['hello user']);
+        });
     })
 
-    test.todo("array lit")
+    it("formal fns", () => {
+        refl.interpret("three() { 3 }")
+        expect(refl.interpret("three()")).toEqual(3)
+    })
 
-    test.todo("iteration")
+    xit("array lit", () => {
+        refl.interpret('a=[1,2,3]');
+        expect(refl.interpret('a')).toEqual([1,2,3])
+        expect(refl.interpret('a[0]')).toEqual(1)
+        expect(refl.interpret('a[1]')).toEqual(2)
+        expect(refl.interpret('a[2]')).toEqual(3)
+        expect(refl.interpret('a[3]')).toThrow()
+        expect(refl.interpret('a[2]=-1')).toEqual(-1)
+        expect(refl.interpret('a')).toEqual([1,-1,3])
+    })
+
+    test.todo("associative arrays")
+
+    xit("classes", () => {
+        refl.interpret(`
+          class Greeter {
+              hello(subj) { print('hi, ' + subj); }
+          }
+        `)
+        expect(refl.interpret("Greeter.new.hello('user')")).toEqual("hi, user")
+    })
+
 
     test.todo("ranges")
+
+    test.todo("superclasses")
+    test.todo("eigenclasses")
+    test.todo("modules")
 
     test.todo("mirrors")
     // mirror object: tells you what the structure of function is
     // reflection: give me a class by name, instantiate or call fn by string literal
+
+    test.todo("continuations")
 })

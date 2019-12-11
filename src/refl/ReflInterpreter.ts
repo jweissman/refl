@@ -1,25 +1,13 @@
-import { ReflNode, ReflProgram, PreludeContext } from './lang/ReflNode';
-import { Interpreter, SimpleAlgebra, instruct } from 'myr';
+import { ReflNode, ReflProgram } from './lang/ReflNode';
+import { Interpreter, SimpleAlgebra, instruct, MyrBoolean } from 'myr';
 import { Compiler } from 'myr/src/myr/vm/Interpreter';
 
 let integerAlgebra = new SimpleAlgebra();
-let lambdaCount = 0, condCount=0;
-let ctx: PreludeContext = {
-    nextAnonymousFunctionLabel: () => {
-        let label = `lambda-${lambdaCount++}`
-        return label;
-    },
-    nextConditionalLabel: () => {
-        let label = `cond-${condCount++}`
-        return label;
-    }
-}
 
 const stripMain = (program: ReflProgram) => {
     return program.map(instruction => {
         if (instruction.label) {
             if (instruction.label === 'main') {
-                // console.log("FOUND old main instruction label", instruction.label)
                 return instruct('noop')
             }
         }
@@ -34,31 +22,27 @@ class ReflCompiler extends Compiler<ReflNode> {
 }
 let compiler = new ReflCompiler();
 
-export class ReflInterpreter {
-    interpreter: Interpreter<ReflNode> = new Interpreter<ReflNode>(integerAlgebra, compiler);
-
+export class ReflInterpreter extends Interpreter<ReflNode> {
+    // interpreter: Interpreter<ReflNode> = new Interpreter<ReflNode>(integerAlgebra, compiler);
 
     constructor() {
-        this.interpreter.db.put("true", true);
-        this.interpreter.db.put("false", false);
-        // console.log(this.interpreter.machine.db)
+        super(integerAlgebra, compiler);
+        this.db.put("true", new MyrBoolean(true));
+        this.db.put("false", new MyrBoolean(false));
     }
 
     get activeProgram(): ReflProgram {
-        return this.interpreter.code;
+        return this.code;
     }
 
-    run(program: ReflNode[]): any {
-        let prelude = program.flatMap(elem => elem.prelude(ctx))
+    interpret(program: ReflNode[]): any {
         let instructions = program.flatMap(elem => elem.instructions)
         let code: ReflProgram = [
-            ...prelude,
             instruct('noop', { label: 'main' }),
             ...instructions,
         ]
         let executable = [ ...stripMain(this.activeProgram), ...code ];
-        this.interpreter.run(executable)
-        let { result } = this.interpreter
-        return result;
+        this.run(executable)
+        return this.result;
     }
 }

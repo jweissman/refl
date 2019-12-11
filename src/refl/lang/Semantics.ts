@@ -1,6 +1,5 @@
 import Grammar from './Grammar';
 import { Semantics, Node } from 'ohm-js';
-import { ReflContext } from "../ReflContext";
 import { NumberLiteral } from './NumberLiteral';
 import { BinaryExpression } from './BinaryExpression';
 import { Identifier } from './Identifier';
@@ -14,11 +13,28 @@ import { LogicalExpression } from './LogicalExpression';
 import { Program } from './Program';
 import { StringLiteral } from './StringLiteral';
 import WhileExpression from './WhileExpression';
+import { ClassDefinition } from './ClassDefinition';
+import { DotAccess } from './DotAccess';
 
 const semantics: Semantics = Grammar.createSemantics();
 
 const tree = {
     Stmt: (e: Node, _delim: Node) => e.tree,
+
+    Defclass: (_class: Node, id: Node, body: Node) => {
+        return new AssignmentExpression(id.tree, 
+            new ClassDefinition(id.tree, body.tree)
+        );
+        // return new ClassDefinition(id.tree, body.tree);
+    },
+
+    DotAccess_method: (obj: Node, _dot: Node, message: Node) => {
+        return new DotAccess(obj.tree, message.tree);
+    },
+
+    DotAccess_property: (obj: Node, _dot: Node, message: Node) => {
+        return new DotAccess(obj.tree, message.tree);
+    },
 
     Funcall: (fn: Node, _lp: Node, paramList: Node, _rp: Node): FunctionInvocation => {
         return new FunctionInvocation(fn.tree, paramList.tree);
@@ -28,19 +44,19 @@ const tree = {
         return argList.tree.map((id: Identifier) => id.name);
     },
 
-    Defun_one: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
+    Defun: (id: Node, fn: Node) => {
+        return new AssignmentExpression(id.tree, fn.tree);
+    },
+
+    Lambda_one: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, body.tree),
 
-    Defun_multi: (args: Node, _arrow: Node, block: Node): FunctionLiteral =>
+    Lambda_multi: (args: Node, _arrow: Node, block: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, block.tree),
 
     Block: (_lb: Node, body: Node, _rb: Node) =>
         new Program(body.tree),
 
-    FunctionBody: (_lb: Node, body: Node, _rb: Node) =>
-        new Program(body.tree, true),
-   //      = "while" "(" Expr ")" Block
- 
     While: (_while: Node, _lp: Node, test: Node, _rp: Node, block: Node): WhileExpression => {
         return new WhileExpression(test.tree, block.tree)
     },
@@ -109,7 +125,7 @@ const tree = {
         return new UnaryExpression('()', pri.tree);
     },
 
-    StringLit_single: (_lq: Node, content: Node, _rq: Node) => {
+    StringLit: (_lq: Node, content: Node, _rq: Node) => {
         return new StringLiteral(content.sourceString);
     },
 
@@ -130,14 +146,14 @@ const tree = {
 
 semantics.addAttribute('tree', tree);
 
-let globalCtx = new ReflContext();
-semantics.addOperation('eval', {
-    Stmt: (e: Node, _delim: Node) => { return e.eval() },
-    Expr: (e: Node) => e.tree.evaluate(globalCtx),
-    NonemptyListOf: (eFirst: Node, _sep: any, eRest: Node) => {
-        let result = [eFirst.eval(), ...eRest.eval()];
-        return result;
-    },
-});
+// let globalCtx = new ReflContext();
+// semantics.addOperation('eval', {
+//     Stmt: (e: Node, _delim: Node) => { return e.eval() },
+//     // Expr: (e: Node) => e.tree.evaluate(globalCtx),
+//     NonemptyListOf: (eFirst: Node, _sep: any, eRest: Node) => {
+//         let result = [eFirst.eval(), ...eRest.eval()];
+//         return result;
+//     },
+// });
 
 export default semantics;

@@ -1,5 +1,5 @@
 import { ReflNode, ReflProgram } from "./ReflNode";
-import { instruct } from "myr";
+import { instruct, MyrBoolean } from "myr";
 
 let whiles = 0;
 export default class WhileExpression extends ReflNode {
@@ -7,18 +7,14 @@ export default class WhileExpression extends ReflNode {
         super();
     }
 
-    prelude(): ReflProgram {
-        return [];
-    }
-
     get instructions(): ReflProgram {
         let w = whiles++;
-        let labelBegin = `while-${whiles}-begin`,
-            labelEnd   = `while-${whiles}-end`
+        let labelBegin = `while-${w}-begin`,
+            labelEnd   = `while-${w}-end`
         return [
             instruct('noop', { label: labelBegin }),
             ...this.test.instructions, // true/false
-            instruct('push', { value: false }),
+            instruct('push', { value: new MyrBoolean(false) }),
             instruct('cmp'), 
             // stack top is zero if we are done (i.e. test expr evals => true)
             instruct("jump_if_zero", { target: labelEnd }),
