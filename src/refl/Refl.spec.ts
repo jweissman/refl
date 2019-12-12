@@ -1,4 +1,5 @@
 import Refl from "./Refl"
+import { MyrClass, MyrObject } from "myr";
 
 describe(Refl, () => {
     let refl: Refl;
@@ -284,13 +285,63 @@ describe(Refl, () => {
         expect(refl.interpret("user.scores")).toEqual([88, 94, 87, 78, 85, 92])
     })
 
-    xit("classes", () => {
-        refl.interpret(`
-          class Greeter {
-              hello(subj) { print('hi, ' + subj); }
-          }
-        `)
-        expect(refl.interpret("Greeter.new.hello('user')")).toEqual("hi, user")
+    fit('hash manip', () => {
+        refl.interpret("match={playerOne: 'Bob', playerTwo: 'Fiona'}")
+        refl.interpret("match.playerOne = 'Tom'")
+        expect("match.playerOne").toEqual("Tom")
+    })
+
+    xit('hashes accept fns', () => {
+        refl.interpret("math={double:(x)=>x*2}")
+        expect("math.double(8)").toEqual(16)
+    })
+
+    describe("classes", () => {
+        it('calls niladic member methods', () => {
+            refl.interpret('class Baz { bar() { "foo" }}');
+            expect(refl.interpret("Baz.new.bar()")).toEqual("foo")
+            // should work as bareword too
+            expect(refl.interpret("Baz.new.bar")).toEqual("foo")
+        });
+
+        it('calls member methods with params', () => {
+            refl.interpret(`
+              class Greeter {
+                  hello(subj) { print('hi, ' + subj); }
+              }
+            `)
+            expect(refl.interpret("Greeter")).toBeInstanceOf(MyrClass)
+            expect(refl.interpret("g = Greeter.new")).toBeInstanceOf(MyrObject)
+            // refl.interpret("print(g)")
+            expect(refl.interpret("g.hello('user')")).toEqual("hi, user")
+            expect(refl.interpret("g.hello('world')")).toEqual("hi, world")
+        });
+
+        // remembers values...
+        xit("member variables", () => {
+            refl.interpret(`
+              class Counter {
+                  value = 0
+                  inc() { self.value = self.value + 1 }
+              }
+            `)
+            refl.interpret("a = Counter.new")
+            refl.interpret("b = Counter.new")
+            expect(refl.interpret("a.value")).toEqual(0)
+            expect(refl.interpret("b.value")).toEqual(0)
+            refl.interpret("a.inc()")
+            expect(refl.interpret("a.value")).toEqual(1)
+            expect(refl.interpret("b.value")).toEqual(0)
+            refl.interpret("a.inc()")
+            expect(refl.interpret("a.value")).toEqual(2)
+            expect(refl.interpret("b.value")).toEqual(0)
+            refl.interpret("b.inc()")
+            expect(refl.interpret("a.value")).toEqual(2)
+            expect(refl.interpret("b.value")).toEqual(1)
+        })
+
+        test.todo("class statics") // can def methods on Class instance
+        test.todo("introspection") // can ask what class this is
     })
 
 
@@ -299,10 +350,14 @@ describe(Refl, () => {
     test.todo("superclasses")
     test.todo("eigenclasses")
     test.todo("modules")
+    test.todo("traits")
 
     test.todo("mirrors")
     // mirror object: tells you what the structure of function is
     // reflection: give me a class by name, instantiate or call fn by string literal
 
     test.todo("continuations")
+    test.todo("pattern matching")
+
+    test.todo("regex lits")
 })

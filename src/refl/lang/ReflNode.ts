@@ -6,6 +6,6 @@ export type ReflProgram = ReflInstruction[];
 export abstract class ReflNode {
     abstract get instructions(): ReflProgram;
     compile(): ReflProgram {
-        throw new Error("Method not implemented.");
+        throw new Error("ReflNode#compile -- Method not implemented.");
     }
 }

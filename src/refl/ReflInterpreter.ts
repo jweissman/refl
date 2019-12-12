@@ -43,6 +43,7 @@ export class ReflInterpreter extends Interpreter<ReflNode> {
             ...instructions,
         ]
         let executable = [ ...stripMain(this.activeProgram), ...code ];
+        // console.log("\n\n--- EXECUTE ---", "\n\n" + prettyProgram(executable), "=========\n\n")
         this.run(executable)
         return this.result;
     }

@@ -33,7 +33,7 @@ Refl {
       = "(" ListOf<ident, ","> ")"
     
     Assignment
-      = (ArrayIndex | ident) "=" Expr
+      = (ArrayIndex | DotAccess | ident) "=" Expr
 
     CmpExpr
       = LogExpr ">" LogExpr -- gt

@@ -17,11 +17,21 @@ export class DotAccess extends ReflNode {
         if (this.message instanceof Identifier) {
             program = [
                 ...this.object.instructions,
-                instruct('push', { value: new MyrString(this.message.name)}),
-                instruct('hash_get'),
+                // instruct('push', { value: new MyrString(this.message.name)}),
+                instruct('send', { key: this.message.name }),
             ];
+        } else if (this.message instanceof FunctionInvocation) {
+            program = [
+                // gather params...? (okay, yes... but how do we know the arity??)
+                ...this.message.pushArgs(),
+                ...this.object.instructions,
+                instruct('send', { key: this.message.id.name }),
+            ]
+            // console.log("BUILD INSTRUCTIONS FOR DOT ACCESS A FUNCTION", {
+            //     program, message: this.message, object: this.object
+            // })
         } else {
-            console.trace("message wasn't an identifier?")
+            console.trace("message wasn't an identifier or fn invocation?", { msg: this.message })
             program = []
         }
 
