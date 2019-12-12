@@ -7,13 +7,7 @@ export class DotAccess extends ReflNode {
     constructor(public object: ReflNode, public message: ReflNode) { super(); }
 
     get instructions(): ReflProgram {
-        // console.log("Assemble instructions for dot access...", {
-        //     obj: this.object,
-        //     msg: this.message
-        // })
-
         let program: ReflProgram = []
-
         if (this.message instanceof Identifier) {
             program = [
                 ...this.object.instructions,
@@ -22,14 +16,11 @@ export class DotAccess extends ReflNode {
             ];
         } else if (this.message instanceof FunctionInvocation) {
             program = [
-                // gather params...? (okay, yes... but how do we know the arity??)
-                ...this.message.pushArgs(),
+                // gather params...? (okay, yes... but how do we know the arity?? apparently doesn't matter...?)
+                ...this.message.pushArgs(true),
                 ...this.object.instructions,
                 instruct('send', { key: this.message.id.name }),
             ]
-            // console.log("BUILD INSTRUCTIONS FOR DOT ACCESS A FUNCTION", {
-            //     program, message: this.message, object: this.object
-            // })
         } else {
             console.trace("message wasn't an identifier or fn invocation?", { msg: this.message })
             program = []

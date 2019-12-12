@@ -35,7 +35,7 @@ export default class Refl {
                 throw(e);
             }
         } else {
-            console.debug(chalk.blue(match.message))
+            // console.debug(chalk.blue(match.message))
             throw new SyntaxError(match.shortMessage)
             // console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
@@ -57,9 +57,9 @@ export default class Refl {
                     out = this.interpret(input);
                     if (out === undefined) { out = '(no-result)' };
                 } catch (e) {
-                    // if (e.name === 'SyntaxError') {
-                    //     return cb(new repl.Recoverable(e))
-                    // }
+                    if (e.name === 'SyntaxError') {
+                        return cb(new repl.Recoverable(e))
+                    }
                 }
                 if (out !== undefined) { cb(null, out) };
             }

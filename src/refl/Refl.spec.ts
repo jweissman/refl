@@ -285,15 +285,17 @@ describe(Refl, () => {
         expect(refl.interpret("user.scores")).toEqual([88, 94, 87, 78, 85, 92])
     })
 
-    fit('hash manip', () => {
-        refl.interpret("match={playerOne: 'Bob', playerTwo: 'Fiona'}")
-        refl.interpret("match.playerOne = 'Tom'")
-        expect("match.playerOne").toEqual("Tom")
+    it('hash manip', () => {
+        refl.interpret("match={one: 'Bob', two: 'Fiona'}")
+        refl.interpret("match.one = 'Tom'")
+        expect(refl.interpret("match.one")).toEqual("Tom")
+        expect(refl.interpret("match")).toEqual({ one: "Tom", two: "Fiona"})
     })
 
-    xit('hashes accept fns', () => {
-        refl.interpret("math={double:(x)=>x*2}")
-        expect("math.double(8)").toEqual(16)
+    it('hashes accept fns', () => {
+        refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
+        expect(refl.interpret("math.double(8)")).toEqual(16)
+        expect(refl.interpret("math.exp(2,8)")).toEqual(256)
     })
 
     describe("classes", () => {
@@ -310,15 +312,16 @@ describe(Refl, () => {
                   hello(subj) { print('hi, ' + subj); }
               }
             `)
-            expect(refl.interpret("Greeter")).toBeInstanceOf(MyrClass)
-            expect(refl.interpret("g = Greeter.new")).toBeInstanceOf(MyrObject)
+            expect(refl.interpret("Greeter")).toEqual("MyrClass[Greeter]")
+            refl.interpret("g = Greeter.new")
+            // expect(refl.interpret("g = Greeter.new")).toBeInstanceOf(MyrObject)
             // refl.interpret("print(g)")
             expect(refl.interpret("g.hello('user')")).toEqual("hi, user")
             expect(refl.interpret("g.hello('world')")).toEqual("hi, world")
         });
 
         // remembers values...
-        xit("member variables", () => {
+        it("member variables", () => {
             refl.interpret(`
               class Counter {
                   value = 0
@@ -340,8 +343,26 @@ describe(Refl, () => {
             expect(refl.interpret("b.value")).toEqual(1)
         })
 
+        xit('initializes', () => {
+            refl.interpret(`
+              class Car {
+                  initialize(make, model, year) {
+                      self.make = make
+                      self.model = model
+                      self.year = year
+                  }
+              }
+            `)
+            refl.interpret('aerio = Car.new("Suzuki", "Aerio", 2005)');
+            expect(refl.interpret('aerio.make')).toEqual("Suzuki")
+            expect(refl.interpret('aerio.model')).toEqual("Aerio")
+            expect(refl.interpret('aerio.year')).toEqual(2005)
+        });
+
         test.todo("class statics") // can def methods on Class instance
         test.todo("introspection") // can ask what class this is
+        test.todo("inheritance") // has ancestors
+        // test.todo("refinement") // has eigenclass
     })
 
 

@@ -1,19 +1,22 @@
-import { instruct, MyrObject, MyrClass } from "myr";
+import { instruct, MyrObject, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
 import { Program } from "./Program";
 import { FunctionLiteral } from "./FunctionLiteral";
+import { FunctionInvocation } from "./FunctionInvocation";
 
 class CreateObject extends ReflNode {
     constructor(private name: string) {
         super();
     }
 
+    // compiled into something :D
     get instructions(): ReflProgram {
-        let obj = new MyrObject();
+        // let obj = new MyrObject(); // always the same damned object!!!
+        // console.log("CREATE ")
         return [
-            instruct('push', { value: obj }),
+            instruct('construct'),
             instruct('store', { key: this.name })
         ]
     }
@@ -25,10 +28,15 @@ class LoadObject extends ReflNode {
     }
 
     get instructions(): ReflProgram {
-        let obj = new MyrObject();
+        // let obj = new MyrObject();
         return [
             // instruct('push', { value: obj }),
-            instruct('load', { key: this.name })
+            instruct('load', { key: this.name }),
+            // push args and load init
+            // instruct('push', { value: new MyrString("initialize") }),
+            instruct('send', { key: 'initialize' }),
+            instruct('load', { key: this.name }),
+            // instruct('load', { key: this.name })
         ]
     }
 }
@@ -93,20 +101,38 @@ export class ClassDefinition extends ReflNode {
     }
 
     get instantiate(): FunctionLiteral {
+        let ctorArgs: string[] = []
         let autoconstruct = this.body.lines.flatMap(line => {
-                if (line instanceof AssignmentExpression) {
-                    return new SelfAssignment('mu', line.left, line.right);
-                } else {
-                    return line;
+            if (line instanceof AssignmentExpression) {
+                if (line.left instanceof Identifier && line.left.name === 'initialize') {
+                    if (line.right instanceof FunctionLiteral) {
+                        console.log("FOUND INITIALIZE", { line })
+                        ctorArgs = line.right.args;
+                    } else {
+                        throw new Error("initialize should be a fn probably?")
+                    }
                 }
-            })
+                return new SelfAssignment('mu', line.left, line.right);
+            } else {
+                return line;
+            }
+        })
+
+        // this.body.lines.find(line => {
+        //     // have to analyze and find the constructor???
+        //     if (line instanceof )
+
+        // })
         // no args for now?
-        return new FunctionLiteral([],
+        // this IS new
+        return new FunctionLiteral(ctorArgs, // <<--- ctor args
             new Program([
                 // new AssignmentExpression(new Identifier("mu"), )
                 new CreateObject("mu"),
                 ...autoconstruct,
+                // ...runConstructor
                 new LoadObject("mu"),
+                // new FunctionInvocation()
             ])
         );
     }
