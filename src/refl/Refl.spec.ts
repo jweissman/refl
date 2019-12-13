@@ -266,8 +266,9 @@ describe(Refl, () => {
         expect(refl.interpret('a[0]')).toEqual(10)
         expect(refl.interpret('a[1]')).toEqual(20)
         expect(refl.interpret('a[2]')).toEqual(30)
-        expect(refl.interpret('a[3]')).toEqual(null) //toThrow("array index out of bounds")
-        expect(refl.interpret('a[2]=-1')).toEqual([10,20,-1])
+        expect(refl.interpret('a[3]')).toEqual("nil") //toThrow("array index out of bounds")
+        refl.interpret('a[2]=-1'); 
+        expect('a').toEqual([10,20,-1])
         // expect(refl.interpret('a')).toEqual([10,20,-1])
     });
 
@@ -276,6 +277,14 @@ describe(Refl, () => {
         expect(refl.interpret('g()[2]')).toEqual(30)
         refl.interpret('print(g()[2])')
         expect(Refl.tracedOutput).toEqual([30])
+    })
+
+    it('returning array index does not trash the stack', () => {
+        refl.interpret('arr=[1,2,3,4]')
+        refl.interpret('set=(i)=>{arr[i]=5;arr[i]}')
+        expect(refl.interpret("set(4)")).toEqual(5)
+        expect(refl.interpret("arr")).toEqual([1,2,3,4,5])
+        expect(refl.interpreter.machine.stack.length).toEqual(0)
     })
 
     it("associative arrays", () => {
@@ -368,6 +377,7 @@ describe(Refl, () => {
             refl.interpret('aerio = Car.new("Suzuki", "Aerio", 2005)');
             refl.interpret('stinger = Car.new("Kia", "Stinger", 2019)');
             refl.interpret('porsche = Car.new("Porsche", "911", 1963)');
+            refl.interpret('cybertruck = Car.new("Tesla", "Cybertruck", 3001)');
 
             expect(refl.interpret('aerio.make')).toEqual("Suzuki")
             expect(refl.interpret('aerio.model')).toEqual("Aerio")
@@ -380,6 +390,10 @@ describe(Refl, () => {
             expect(refl.interpret('porsche.make')).toEqual("Porsche")
             expect(refl.interpret('porsche.model')).toEqual("911")
             expect(refl.interpret('porsche.year')).toEqual(1963)
+
+            expect(refl.interpret('cybertruck.make')).toEqual("Tesla")
+            expect(refl.interpret('cybertruck.model')).toEqual("Cybertruck")
+            expect(refl.interpret('cybertruck.year')).toEqual(3001)
 
             expect(refl.interpreter.machine.stack.length).toEqual(0)
         });
@@ -403,13 +417,15 @@ describe(Refl, () => {
 
     describe("scope", () => {
         // this is pretty important for general programming :D
-        xit('can mutate global vars from inside a function', () => {
+        it('can mutate global vars from inside a function', () => {
             refl.interpret(`
-              arr=[1,2,3]
+              arr=[1,2,3,4,5]
               set=(x,i)=>arr[i]=x
-              set(10,1)
+              set(10,0)
+              set(20,1)
+              set(30,2)
             `)
-            expect(refl.interpret('arr')).toEqual([10,2,3])
+            expect(refl.interpret('arr')).toEqual([10,20,30,4,5])
         })
     })
 

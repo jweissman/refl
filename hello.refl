@@ -1,31 +1,16 @@
 # hello.refl
 
 fmemo = []
-
-fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
-
-fibm(n) {
-    print(n, fmemo)
-    if (fmemo[fib] == nil) {
-        result = fib(n)
-        fmemo[fib] = result
-        return(result)
-    } else {
-        return(fmemo[fib])
-    }
+fib = (x) => x<2 ? 1 : fibm(x-1) + fibm(x-2);
+fibm(x){
+    if(fmemo[x]==nil){
+        fmemo[x]=fib(x)
+    };
+    return(fmemo[x]);
 }
-
-# until = (f,i,n) { f(i); if (i<n) { until(f,i+1,n); } }
-echo = (x) => print(x,fib(x));
-# until(echo, 0, 13) # loop until...
+# echo = (x) => print("fib", x, fib(x));
 
 i = 0;
-n = 35;
-while (i<n) { i=i+1; echo(i); }
-
-# echo(15);
-# echo(16);
-# echo(17);
-# echo(18);
-# echo(19);
-# echo(20);
+max = 45;
+while (i<max) { i=i+1; print(fib(i)); }
+print(fmemo)
