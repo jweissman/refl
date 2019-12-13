@@ -343,7 +343,7 @@ describe(Refl, () => {
             expect(refl.interpret("b.value")).toEqual(1)
         })
 
-        xit('initializes', () => {
+        it('initializes', () => {
             refl.interpret(`
               class Car {
                   initialize(make, model, year) {

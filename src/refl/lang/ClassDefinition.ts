@@ -17,25 +17,36 @@ class CreateObject extends ReflNode {
         // console.log("CREATE ")
         return [
             instruct('construct'),
-            instruct('store', { key: this.name })
+            instruct('store', { key: this.name }),
+            // instruct('dump', { key: 'create-obj' })
         ]
     }
 }
 
 class LoadObject extends ReflNode {
-    constructor(private name: string) {
+    constructor(private name: string, private ctorArgs: string[] = []) {
         super();
     }
 
     get instructions(): ReflProgram {
         // let obj = new MyrObject();
+        let loadCtorArgs = 
+            this.ctorArgs.map(arg => instruct('load', { key: arg}));
         return [
             // instruct('push', { value: obj }),
+
+            // instruct('load', { key: this.name }),
+            ...loadCtorArgs,
+            instruct('load', { key: this.name }),
+            // instruct('dump', { key: 'load-obj'}),
+            instruct('send', { key: 'initialize' }),
+
             instruct('load', { key: this.name }),
             // push args and load init
             // instruct('push', { value: new MyrString("initialize") }),
-            instruct('send', { key: 'initialize' }),
-            instruct('load', { key: this.name }),
+            instruct('dump', { key: 'post-init' }),
+            // instruct('send', { key: 'initialize' }),
+            // instruct('load', { key: this.name }),
             // instruct('load', { key: this.name })
         ]
     }
@@ -54,12 +65,13 @@ class SelfAssignment extends AssignmentExpression {
 
     get instructions(): ReflProgram {
         // if (this.left instanceof Identifier) {
-            let name = (this.left as Identifier).name;
+        let name = (this.left as Identifier).name;
         return [
             instruct('load', { key: this.name }),
             ...this.right.instructions,
             // based on the type of the thing on the right...
             instruct('send_eq', { key: name }),
+            // instruct('dump', { key: `assign-${name}` }),
             // instruct('pop'),
         ]
         // }
@@ -106,8 +118,8 @@ export class ClassDefinition extends ReflNode {
             if (line instanceof AssignmentExpression) {
                 if (line.left instanceof Identifier && line.left.name === 'initialize') {
                     if (line.right instanceof FunctionLiteral) {
-                        console.log("FOUND INITIALIZE", { line })
                         ctorArgs = line.right.args;
+                        // console.log("FOUND INITIALIZE", { line, ctorArgs })
                     } else {
                         throw new Error("initialize should be a fn probably?")
                     }
@@ -121,7 +133,6 @@ export class ClassDefinition extends ReflNode {
         // this.body.lines.find(line => {
         //     // have to analyze and find the constructor???
         //     if (line instanceof )
-
         // })
         // no args for now?
         // this IS new
@@ -131,7 +142,8 @@ export class ClassDefinition extends ReflNode {
                 new CreateObject("mu"),
                 ...autoconstruct,
                 // ...runConstructor
-                new LoadObject("mu"),
+                // ...loadCtorArgs,
+                new LoadObject("mu", ctorArgs.reverse()),
                 // new FunctionInvocation()
             ])
         );

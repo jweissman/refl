@@ -19,6 +19,7 @@ export class DotAccess extends ReflNode {
                 // gather params...? (okay, yes... but how do we know the arity?? apparently doesn't matter...?)
                 ...this.message.pushArgs(true),
                 ...this.object.instructions,
+                // instruct('dump', { key: `send-${this.message.id.name}`}),
                 instruct('send', { key: this.message.id.name }),
             ]
         } else {
