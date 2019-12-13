@@ -2,7 +2,7 @@
 
 fmemo = []
 
-fib = (n) => n < 2 ? 1 : (fibm(n-1) + fibm(n-2));
+fib = (n) => n < 2 ? 1 : (fib(n-1) + fib(n-2));
 
 fibm(n) {
     print(n, fmemo)

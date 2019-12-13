@@ -43,6 +43,7 @@
     ]
   },
   "devDependencies": {
+    "@types/clear": "^0.1.0",
     "ts-jest": "^24.2.0"
   }
 }

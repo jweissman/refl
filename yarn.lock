@@ -1233,6 +1233,11 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/clear@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@types/clear/-/clear-0.1.0.tgz#915bff8e6438d080f05888d28f6beeebc54159c0"
+  integrity sha512-b2VgNzu3BxxM2nGhZSMzkiaTaCClevKkBCtgpV2Al0eGaEeQgTk5qHedzNxi/SgsvmDbqxWKDAIrxZNVKyDCXw==
+
 "@types/color-name@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@types/color-name/-/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"

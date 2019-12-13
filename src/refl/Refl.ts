@@ -1,7 +1,6 @@
 import Grammar from './lang/Grammar';
 import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
-
 import chalk from 'chalk';
 import { ReflInterpreter } from './ReflInterpreter';
 import { prettyProgram, MyrNil } from 'myr';
@@ -13,8 +12,8 @@ export default class Refl {
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
             let printableArgs = args.map(arg => arg !== undefined && arg.toJS())
-            console.log(...printableArgs);
-            // console.log(chalk.bgBlue(chalk.whiteBright(args)));
+            // console.log(...printableArgs);
+            console.log(chalk.bgBlack(chalk.greenBright(printableArgs)));
             Refl.tracedOutput.push(...printableArgs);
             return new MyrNil();
         },
@@ -35,7 +34,7 @@ export default class Refl {
                 throw(e);
             }
         } else {
-            // console.debug(chalk.blue(match.message))
+            console.debug(chalk.blue(match.message))
             throw new SyntaxError(match.shortMessage)
             // console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
@@ -47,7 +46,9 @@ export default class Refl {
         const figlet = require('figlet');
         const repl = require('repl');
         clear();
-        console.log(chalk.green(figlet.textSync('refl')))
+        console.log(
+            chalk.green(figlet.textSync('refl'))
+        )
         console.log("\n" + chalk.blue("Refl") + chalk.gray("Repl"));
         const server = repl.start({
             prompt: "\n(refl) ",
@@ -61,7 +62,9 @@ export default class Refl {
                         return cb(new repl.Recoverable(e))
                     }
                 }
-                if (out !== undefined) { cb(null, out) };
+                cb(null, out)
+                // if (out !== undefined) { cb(null, out) }
+                // else { cb(null,null)}
             }
         })
 
@@ -71,8 +74,24 @@ export default class Refl {
         })
 
         server.defineCommand('stack', {
-            help: 'Echo current program instructions',
+            help: 'Dump current stack elements',
             action: () => { console.log(this.interpreter.machine.stack) }
+        })
+
+        server.defineCommand('trace', {
+            help: 'Activate code trace',
+            action: () => {
+                this.interpreter.trace = true;
+                console.log(chalk.blue("(trace activated)"));
+            }
+        })
+
+        server.defineCommand('notrace', {
+            help: 'Deactivate code trace',
+            action: () => {
+                this.interpreter.trace = false;
+                console.log(chalk.blue("(trace deactivated)"));
+            }
         })
 
     }

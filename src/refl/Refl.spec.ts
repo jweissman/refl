@@ -299,6 +299,16 @@ describe(Refl, () => {
     })
 
     describe("classes", () => {
+        it('construct keeps a clear stack', () => {
+            refl.interpret("class Zap { print('laser sound') }")
+            refl.interpret("zap = Zap.new")
+            expect(refl.interpreter.machine.stack.length).toEqual(0)
+
+            refl.interpret("class Bam { initialize() { 2+2; 3+4; 5+8 }}")
+            refl.interpret("bam = Bam.new")
+            expect(refl.interpreter.machine.stack.length).toEqual(0)
+        })
+
         it('calls niladic member methods', () => {
             refl.interpret('class Baz { bar() { "foo" }}');
             expect(refl.interpret("Baz.new.bar()")).toEqual("foo")
@@ -330,6 +340,7 @@ describe(Refl, () => {
             `)
             refl.interpret("a = Counter.new")
             refl.interpret("b = Counter.new")
+
             expect(refl.interpret("a.value")).toEqual(0)
             expect(refl.interpret("b.value")).toEqual(0)
             refl.interpret("a.inc()")
@@ -353,16 +364,53 @@ describe(Refl, () => {
                   }
               }
             `)
+
             refl.interpret('aerio = Car.new("Suzuki", "Aerio", 2005)');
+            refl.interpret('stinger = Car.new("Kia", "Stinger", 2019)');
+            refl.interpret('porsche = Car.new("Porsche", "911", 1963)');
+
             expect(refl.interpret('aerio.make')).toEqual("Suzuki")
             expect(refl.interpret('aerio.model')).toEqual("Aerio")
             expect(refl.interpret('aerio.year')).toEqual(2005)
+
+            expect(refl.interpret('stinger.make')).toEqual("Kia")
+            expect(refl.interpret('stinger.model')).toEqual("Stinger")
+            expect(refl.interpret('stinger.year')).toEqual(2019)
+
+            expect(refl.interpret('porsche.make')).toEqual("Porsche")
+            expect(refl.interpret('porsche.model')).toEqual("911")
+            expect(refl.interpret('porsche.year')).toEqual(1963)
+
+            expect(refl.interpreter.machine.stack.length).toEqual(0)
         });
 
+        // can ask what class this is
+        it("introspection", () => {
+            refl.interpret(`class Food {
+                initialize(name, calories) {
+                    self.name = name; self.calories = calories;
+                }
+            }`)
+            refl.interpret("pasta = Food.new('Spaghetti', 680)");
+            expect(refl.interpret('pasta.class')).toEqual("MyrClass[Food]")
+            expect(refl.interpret('pasta.class.name')).toEqual("Food")
+        })
+
         test.todo("class statics") // can def methods on Class instance
-        test.todo("introspection") // can ask what class this is
         test.todo("inheritance") // has ancestors
         // test.todo("refinement") // has eigenclass
+    })
+
+    describe("scope", () => {
+        // this is pretty important for general programming :D
+        xit('can mutate global vars from inside a function', () => {
+            refl.interpret(`
+              arr=[1,2,3]
+              set=(x,i)=>arr[i]=x
+              set(10,1)
+            `)
+            expect(refl.interpret('arr')).toEqual([10,2,3])
+        })
     })
 
 
