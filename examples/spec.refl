@@ -14,7 +14,7 @@ class Expectation {
 expect = (value) => Expectation.new(value)
 
 expect(true).toEqual(true)
-expect(true).not().toEqual(false)
+# expect(true).not().toEqual(false)
 
 expect(1).toEqual(0)
-expect({a:1}).not().toEqual({a:1})
+# expect({a:1}).not().toEqual({a:1})

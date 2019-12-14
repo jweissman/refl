@@ -33,15 +33,28 @@ Functions are first class citizens...
 There is notation for classes as well.
 
 ```
-class Car {
-    initialize(make, model, year) {
-        self.make = make
-        self.model = model
-        self.year = year
+class Node {
+    initialize(label,left,right) {
+        self.label = label;
+        self.left = left;
+        self.right = right;
+    }
+
+    visit(fn) {
+        fn(self);
+        if (self.left != nil) {
+          self.left.visit(fn);
+        }
+        if (self.right != nil) {
+          self.right.visit(fn);
+        }
     }
 }
 
-cybertruck = Car.new("Tesla", "Cybertruck", 3001)
-cybertruck.make # "Tesla"
+one = Node.new("one",nil,nil)
+three = Node.new("three",nil,nil)
+two = Node.new("two",three,nil)
+root = Node.new("root",one, two)
+root.visit((node) => print(node.label))
 ```
 

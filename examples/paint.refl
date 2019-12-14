@@ -1,0 +1,59 @@
+palette = {
+    red: 31,
+    green: 32,
+    yellow: 33,
+    blue: 34,
+    magenta: 35,
+    cyan: 36
+}
+
+class Paint {
+    red(message)    { self.color(message, palette.red) }
+    green(message)  { self.color(message, palette.green) }
+    yellow(message) { self.color(message, palette.yellow) }
+    blue(message)   { self.color(message, palette.blue) }
+    magenta(message)   { self.color(message, palette.magenta)}
+    cyan(message)   { self.color(message, palette.cyan) }
+
+    redBright(message)        { self.colorBright(message, palette.red) }
+    greenBright(message)      { self.colorBright(message, palette.green) }
+    yellowBright(message)     { self.colorBright(message, palette.yellow) }
+    blueBright(message)       { self.colorBright(message, palette.blue) }
+    magentaBright(message) { self.colorBright(message, palette.magenta) }
+    cyanBright(message) { self.colorBright(message, palette.cyan) }
+
+    rainbow(message) {
+        chs = chars(message)
+        max=len(chs)
+        i=0
+        str=""
+        while(i<max) {
+           clr = palette.red+rand(4)
+           print(self.colorBright(chs[i],clr)) #,self.color(chs[i],clr)) 
+           
+           i=i+1
+        }
+        str
+    }
+
+    color(message, number) {
+        self.code(number) + message + self.code(0)
+    }
+
+    colorBright(message, number) {
+        self.code(number+60) + message + self.code(0)
+    }
+
+    code(number) { 
+        "\u001b[" + number + "m"
+    }
+}
+
+paint = Paint.new()
+# println(paint.red("red"))
+# println(paint.blue("blue"))
+# println(paint.yellow("yellow"))
+# println(paint.green("green"))
+# println(paint.magenta("magenta"))
+# println(paint.cyan("cyan"))
+println(paint.rainbow("HELLO, EVERYBODY! WELCOME TO THE REFLUTION"))

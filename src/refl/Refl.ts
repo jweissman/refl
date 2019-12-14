@@ -3,7 +3,7 @@ import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
 import chalk from 'chalk';
 import { ReflInterpreter } from './ReflInterpreter';
-import { prettyProgram, MyrNil } from 'myr';
+import { prettyProgram, MyrObject, MyrNil, MyrString, MyrArray, MyrNumeric, } from 'myr';
 
 export default class Refl {
     interpreter = new ReflInterpreter();
@@ -11,13 +11,41 @@ export default class Refl {
     static suppressOutput: boolean = false
 
     static builtins: { [key: string]: Function } = {
+        len: (arr: MyrArray | MyrString) => {
+            let len: MyrObject =new MyrNil();
+            if (arr instanceof MyrArray) {
+                len = new MyrNumeric(arr.elements.length);
+            } else if (arr instanceof MyrString) {
+                len = new MyrNumeric(arr.value.length);
+            }
+            // console.log("LEN", { arr, len })
+            return len;
+        },
+
+        chars: (s: MyrString) => {
+            let chars = new MyrArray(
+                s.value.split("").map(ch => new MyrString(ch))
+            );
+            // console.log("CHARS", chars)
+            return chars;
+        },
+
+        rand: (n: MyrNumeric) => new MyrNumeric(
+            Math.floor(Math.random()*(n.value+1))
+        ),
+
+        println: (...args: any[]) => {
+            Refl.builtins.print(...args); //([...args,"\n"]));
+            process.stdout.write("\n");
+        },
+
         print: (...args: any[]) => {
-            let printableArgs = args.map(arg => arg !== undefined &&
-                arg.toJS()
+            let printableArgs: string[] = args.map(arg => arg !== undefined &&
+                (arg.toJS())
             )
             // console.log(...printableArgs);
             if (!Refl.suppressOutput) {
-                console.log(chalk.bgBlack(chalk.greenBright(printableArgs)));
+                process.stdout.write(printableArgs.join(""));
             }
             Refl.tracedOutput.push(...printableArgs);
             return new MyrNil();

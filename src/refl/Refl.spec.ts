@@ -337,7 +337,7 @@ describe(Refl, () => {
         it('calls member methods with params', () => {
             refl.interpret(`
               class Greeter {
-                  hello(subj) { print('hi, ' + subj); }
+                  hello(subj) { 'hi, ' + subj; }
               }
             `)
             expect(refl.interpret("Greeter")).toEqual("MyrClass[Greeter]")
@@ -440,6 +440,12 @@ describe(Refl, () => {
         })
     })
 
+    it("exec", () => {
+        expect(refl.interpret("len([1,2])")).toEqual(2)
+        expect(refl.interpret("len([1,2,3,4,5])")).toEqual(5)
+        expect(refl.interpret("len([1,2,3,4,5])+5")).toEqual(10)
+        expect(refl.interpret("5+len([1,2,3,4,5])")).toEqual(10)
+    })
 
     test.todo("ranges")
 

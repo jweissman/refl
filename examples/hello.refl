@@ -6,9 +6,9 @@ class Greeter {
     }
 
     welcome(subject) {
-        print(self.prompt + subject)
+        println(self.prompt + subject)
     }
 }
 
-greeter = Greeter.new("Hello, ")
-greeter.welcome("world")
+greeter = Greeter.new("Hello, ");
+greeter.welcome("world");

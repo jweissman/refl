@@ -1,7 +1,7 @@
 Refl {
     Program
-      = ListOf<Expr, br*> br*
-	  br = ";" | "\n" | "\r"
+      = ListOf<Expr, delim*> delim*
+    delim = ";" | lineTerminator
 
     Expr
       = Assignment
@@ -96,17 +96,37 @@ Refl {
       | (DotAccess | Funcall | ident) "." ident -- property
 
     StringLit
-      = "'" #(~"'" any)* "'"
-      | "\"" #(~"\"" any)* "\""
+      = "'" #singleStringCharacter* "'"
+      | "\"" #doubleStringCharacter* "\""
+
+    singleStringCharacter
+      = ~("\'" | "\\" | "\n") #sourceCharacter -- non_escaped
+      | "\\" unicodeLiteral                   -- escaped
+   
+    doubleStringCharacter
+      = ~("\"" | "\\" | "\n") #sourceCharacter -- non_escaped
+      | "\\" unicodeLiteral                   -- escaped
+    
+    sourceCharacter = any
+    
+    unicodeLiteral
+      = "u" hexDigit hexDigit hexDigit hexDigit
 
     ident
-      = letter alnum*
+      = (~keyword) letter alnum*
     
     number
       = digit+
 
-    comment
-      = #"#" #(~"\n" any)* "\n"?
+    keyword = "while"
 
-	  space += comment  
+	  space := whitespace | lineTerminator | comment  
+    // Override Ohm's built-in definition of space.
+    //space := whitespace | comment 
+    whitespace = #" " | " " | "\t"
+    lineTerminator = "\n" | "\r"
+
+    comment
+      = #"#" #(~lineTerminator any)* lineTerminator?
+
 }

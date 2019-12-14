@@ -133,7 +133,30 @@ const tree = {
     },
 
     StringLit: (_lq: Node, content: Node, _rq: Node) => {
-        return new StringLiteral(content.sourceString);
+        // debugger;
+        // console.log(content.sourceString, "(string lit)", "\u001b[31mokay\u001b[0m")
+        // console.log(content.source.contents)
+        // console.log(content.children.map(c => c.sourceString).join(""))
+
+        return new StringLiteral(content.tree.join(""));
+    },
+    doubleStringCharacter_escaped: (_escape: Node, content: Node) => content.tree,
+
+    sourceCharacter: (char: Node) => {
+        // console.log("SRC", char.sourceString)
+        return char.sourceString
+    },
+    unicodeLiteral: (_u: Node, a: Node, b: Node, c: Node, d: Node) => {
+        let alpha = parseInt(a.sourceString,16);
+        let beta = parseInt(b.sourceString,16);
+        let gamma = parseInt(c.sourceString,16);
+        let delta = parseInt(d.sourceString,16);
+        return String.fromCharCode(
+            alpha*0x1000 +
+            beta*0x0100 +
+            gamma*0x0010 +
+            delta*0x0001
+        );
     },
 
     HashLit: (_lb: Node, kvPairs: Node, _rb: Node) => {
