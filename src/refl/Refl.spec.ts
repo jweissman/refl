@@ -447,6 +447,11 @@ describe(Refl, () => {
         expect(refl.interpret("5+len([1,2,3,4,5])")).toEqual(10)
     })
 
+    test.todo("tree literal (xhtml structure)")
+    test.todo("imports (use x from y)")
+    test.todo("@ member access (self sugar)")
+    test.todo("default parameter values")
+
     test.todo("ranges")
 
     test.todo("superclasses")

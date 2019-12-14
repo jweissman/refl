@@ -1,0 +1,6 @@
+use 'restfl';
+
+class DummyResource {
+}
+
+restfl.route("/", DummyResource)

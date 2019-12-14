@@ -89,17 +89,20 @@ export class ClassDefinition extends ReflNode {
         let foundInit: boolean = false;
         let autoconstruct = this.body.lines.flatMap(line => {
             if (line instanceof AssignmentExpression) {
-                if (line.left instanceof Identifier && line.left.name === 'initialize') {
+                if (line.left instanceof Identifier) {
                     if (line.right instanceof FunctionLiteral) {
-                        ctorArgs = line.right.args;
-                        foundInit = true;
-                        // for (let i = 0; i < ctorArgs.length; i++) {
+                        line.right.label = `${this.id.name}.${line.left.name}`;
+                        if (line.left.name === 'initialize') {
+                            ctorArgs = line.right.args;
+                            foundInit = true;
+                            // for (let i = 0; i < ctorArgs.length; i++) {
                             // line.right.body.instructions.push(
                             //     instruct("exec", { key: 'print' })
                             // )
-                        // }
-                    } else {
-                        throw new Error("initialize should be a fn probably?")
+                            // }
+                        // } else {
+                            // throw new Error("initialize should be a fn probably?")
+                        }
                     }
                 }
                 return new SelfAssignment('mu', line.left, line.right);
@@ -108,12 +111,14 @@ export class ClassDefinition extends ReflNode {
             }
         })
 
-        return new FunctionLiteral(ctorArgs,
+        let fn = new FunctionLiteral(ctorArgs,
             new Program([
                 new CreateObject("mu", this.id.name),
                 ...autoconstruct,
                 new LoadObject("mu", ctorArgs.reverse(), foundInit),
-            ])
+            ]),
         );
+        fn.label = `${this.id.name}.new`;
+        return fn;
     }
 } 

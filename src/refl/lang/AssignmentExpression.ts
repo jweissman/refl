@@ -4,6 +4,7 @@ import { Identifier } from './Identifier';
 import { throwStatement } from '@babel/types';
 import { ArrayLookup } from './ArrayLookup';
 import { DotAccess } from './DotAccess';
+import { FunctionLiteral } from './FunctionLiteral';
 
 export class AssignmentExpression extends ReflNode {
     constructor(public left: ReflNode, public right: ReflNode) {
@@ -12,6 +13,9 @@ export class AssignmentExpression extends ReflNode {
 
     get instructions(): ReflProgram {
         if (this.left instanceof Identifier) {
+            if (this.right instanceof FunctionLiteral) {
+                this.right.label = this.left.name;
+            }
             return [
                 ...this.right.instructions,
                 // based on the type of the thing on the right...

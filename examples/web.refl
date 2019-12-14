@@ -1,0 +1,21 @@
+# use 'reactive-ui' as render;
+# use 'restfl' as app;
+# class Homepage {
+#   index() {
+#     <html>
+#       <head>
+#         <title>Homepage</title>
+#       </head>
+#       <body>
+#           <Button onClick={@inc}>Click me</Button>
+#           pressed {@clicks} times
+#       </body>
+#     </html>;
+#   }
+#
+#   increment() { @clicks = @clicks + 1 }
+# }
+# browser
+# render(Homepage.index)
+# server
+# app.route("/", Homepage)

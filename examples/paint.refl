@@ -14,6 +14,7 @@ class Paint {
     blue(message)   { self.color(message, palette.blue) }
     magenta(message)   { self.color(message, palette.magenta)}
     cyan(message)   { self.color(message, palette.cyan) }
+    white(message) { message }
 
     redBright(message)        { self.colorBright(message, palette.red) }
     greenBright(message)      { self.colorBright(message, palette.green) }
@@ -29,8 +30,7 @@ class Paint {
         str=""
         while(i<max) {
            clr = palette.red+rand(4)
-           print(self.colorBright(chs[i],clr)) #,self.color(chs[i],clr)) 
-           
+           print(self.colorBright(chs[i],clr))
            i=i+1
         }
         str
@@ -50,10 +50,11 @@ class Paint {
 }
 
 paint = Paint.new()
-# println(paint.red("red"))
-# println(paint.blue("blue"))
-# println(paint.yellow("yellow"))
-# println(paint.green("green"))
-# println(paint.magenta("magenta"))
-# println(paint.cyan("cyan"))
-println(paint.rainbow("HELLO, EVERYBODY! WELCOME TO THE REFLUTION"))
+println(paint.red("red for all the roses"))
+println(paint.blue("as blue is for the sky"))
+println(paint.yellow("bright yellow for the sun above"))
+println(paint.green("deep green for trees to climb"))
+println(paint.magenta("cool magenta for the mountain range"))
+println(paint.cyan("and cyan for the dew"))
+println(paint.white("now together all the colors say"))
+println(paint.rainbow("THIS ReflUTION IS FOR YOU"))

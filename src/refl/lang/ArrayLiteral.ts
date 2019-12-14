@@ -16,18 +16,11 @@ export class ArrayLiteral extends ReflNode {
             ...element.instructions,
             instruct('arr_put'),
             loadArr,
-            // ...(index < this.elements.length-1 ? [instruct('load', { key: 'my-new-arr '})] : []),
         ]);
         let construct = [
             instruct('push', { value: new MyrArray() }),
             instruct('store', { key: 'my-new-arr '}),
-            ...addElems, //.join(loadArr),
-
-
-            // ...(new FunctionInvocation(new Identifier("len"),[]).instructions),
-            // instruct('compile', { body: new FunctionInvocation() }),
-            // instruct('send_eq', { key: 'length'}),
-            // instruct('pop'),
+            ...addElems,
         ]
         return construct;
     }

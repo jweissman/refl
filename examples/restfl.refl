@@ -1,0 +1,18 @@
+class Restfl {
+   # routing_table = {}
+   # route(path, handler) {
+   #    @routing_table[path]=handler
+   # } 
+   # handle(request) {
+   #     if (request.method == "GET") {
+   #       match(request.path).new().index()
+   #     } else {
+   #       error(404)  
+   #     }
+   # }
+   # error(code) {
+   #     print("error: " + code(number))
+   # }
+}
+
+Restfl.new()
