@@ -89,7 +89,7 @@ Refl {
     ArrayIndex = (Funcall | ArrayIndex | ident) "[" Expr "]"
     
     Funcall
-      = ident "(" ListOf<Expr, ","> ")"
+      = (Funcall | ident) "(" ListOf<Expr, ","> ")"
 
     DotAccess
       = (DotAccess | Funcall | ident) "." Funcall -- method

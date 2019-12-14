@@ -39,7 +39,7 @@ class LoadObject extends ReflNode {
                 instruct('mark'), // insert tombstone
                 ...loadCtorArgs,
                 instruct('load', { key: this.name }),
-                instruct('send', { key: 'initialize' }),
+                instruct('send_call', { key: 'initialize' }),
                 instruct('sweep'), // pop until tombstone
             ] : []),
             instruct('load', { key: this.name }),

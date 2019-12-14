@@ -102,6 +102,7 @@ describe(Refl, () => {
             refl.interpret("quadruple=twice(double)")
             expect(refl.interpret("quadruple(5)")).toEqual(20)
             expect(refl.interpret("quadruple(24)")).toEqual(96)
+            expect(refl.interpret("twice((x)=>x*2)(2)")).toEqual(8)
         })
 
         it('closes around known values at definition time', () => {
@@ -307,6 +308,12 @@ describe(Refl, () => {
         refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
         expect(refl.interpret("math.double(8)")).toEqual(16)
         expect(refl.interpret("math.exp(2,8)")).toEqual(256)
+    });
+
+    it('treat hash function members treat as values', () => {
+        refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
+        expect(refl.interpret("math.double")).toMatch("MyrFunction")
+        expect(refl.interpret("math.exp")).toMatch("MyrFunction")
     })
 
     describe("classes", () => {
@@ -322,9 +329,9 @@ describe(Refl, () => {
 
         it('calls niladic member methods', () => {
             refl.interpret('class Baz { bar() { "foo" }}');
-            expect(refl.interpret("Baz.new.bar()")).toEqual("foo")
+            expect(refl.interpret("Baz.new().bar()")).toEqual("foo")
             // should work as bareword too
-            expect(refl.interpret("Baz.new.bar")).toEqual("foo")
+            expect(refl.interpret("Baz.new().bar")).toMatch("MyrFunction")
         });
 
         it('calls member methods with params', () => {
@@ -334,7 +341,7 @@ describe(Refl, () => {
               }
             `)
             expect(refl.interpret("Greeter")).toEqual("MyrClass[Greeter]")
-            refl.interpret("g = Greeter.new")
+            refl.interpret("g = Greeter.new()")
             // expect(refl.interpret("g = Greeter.new")).toBeInstanceOf(MyrObject)
             // refl.interpret("print(g)")
             expect(refl.interpret("g.hello('user')")).toEqual("hi, user")
@@ -349,8 +356,8 @@ describe(Refl, () => {
                   inc() { self.value = self.value + 1 }
               }
             `)
-            refl.interpret("a = Counter.new")
-            refl.interpret("b = Counter.new")
+            refl.interpret("a = Counter.new()")
+            refl.interpret("b = Counter.new()")
 
             expect(refl.interpret("a.value")).toEqual(0)
             expect(refl.interpret("b.value")).toEqual(0)
