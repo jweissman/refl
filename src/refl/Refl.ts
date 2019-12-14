@@ -8,12 +8,17 @@ import { prettyProgram, MyrNil } from 'myr';
 export default class Refl {
     interpreter = new ReflInterpreter();
     static tracedOutput: string[] = []
+    static suppressOutput: boolean = false
 
     static builtins: { [key: string]: Function } = {
         print: (...args: any[]) => {
-            let printableArgs = args.map(arg => arg !== undefined && arg.toJS())
+            let printableArgs = args.map(arg => arg !== undefined &&
+                arg.toJS()
+            )
             // console.log(...printableArgs);
-            console.log(chalk.bgBlack(chalk.greenBright(printableArgs)));
+            if (!Refl.suppressOutput) {
+                console.log(chalk.bgBlack(chalk.greenBright(printableArgs)));
+            }
             Refl.tracedOutput.push(...printableArgs);
             return new MyrNil();
         },

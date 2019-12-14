@@ -1,5 +1,4 @@
-# hello.refl
-
+# fib.refl
 fmemo = []
 fib = (x) => x<2 ? 1 : fibm(x-1) + fibm(x-2);
 fibm(x){
@@ -8,9 +7,7 @@ fibm(x){
     };
     return(fmemo[x]);
 }
-# echo = (x) => print("fib", x, fib(x));
-
 i = 0;
-max = 45;
+max = 85;
 while (i<max) { i=i+1; print(fib(i)); }
 print(fmemo)

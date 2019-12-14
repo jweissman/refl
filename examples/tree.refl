@@ -1,0 +1,25 @@
+# tree.refl
+
+class Node {
+    initialize(label,left,right) {
+        self.label = label;
+        self.left = left;
+        self.right = right;
+    }
+
+    visit(fn) {
+        fn(self);
+        if (self.left != nil) {
+          self.left.visit(fn);
+        }
+        if (self.right != nil) {
+          self.right.visit(fn);
+        }
+    }
+}
+
+one = Node.new("one",nil,nil)
+three = Node.new("three",nil,nil)
+two = Node.new("two",three,nil)
+root = Node.new("root",one, two)
+root.visit((node) => print(node.label))

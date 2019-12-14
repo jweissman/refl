@@ -29,6 +29,9 @@ export class ComparisonExpression extends ReflNode {
             case '==':
                 message = 'eq';
                 break;
+            case '!=':
+                message = 'neq';
+                break;
             case '>=':
                 message = 'gte';
                 break;

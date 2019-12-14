@@ -1,1 +1,1 @@
-export type ComparatorOp = '>' | '<' | '==' | '<=' | '>=';
+export type ComparatorOp = '>' | '<' | '==' | '!=' | '<=' | '>=';

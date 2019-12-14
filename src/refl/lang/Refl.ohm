@@ -39,6 +39,7 @@ Refl {
       = LogExpr ">" LogExpr -- gt
       | LogExpr "<" LogExpr -- lt
       | LogExpr "==" LogExpr -- eq
+      | LogExpr "!=" LogExpr -- neq
       | LogExpr "<=" LogExpr -- lte
       | LogExpr ">=" LogExpr -- gte
       | LogExpr
@@ -91,8 +92,8 @@ Refl {
       = ident "(" ListOf<Expr, ","> ")"
 
     DotAccess
-      = (DotAccess | ident) "." Funcall -- method
-      | (DotAccess | ident) "." ident -- property
+      = (DotAccess | Funcall | ident) "." Funcall -- method
+      | (DotAccess | Funcall | ident) "." ident -- property
 
     StringLit
       = "'" #(~"'" any)* "'"

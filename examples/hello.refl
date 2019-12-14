@@ -1,0 +1,14 @@
+# hello.refl
+
+class Greeter {
+    initialize(prompt) {
+        self.prompt = prompt
+    }
+
+    welcome(subject) {
+        print(self.prompt + subject)
+    }
+}
+
+greeter = Greeter.new("Hello, ")
+greeter.welcome("world")

@@ -94,6 +94,9 @@ const tree = {
     CmpExpr_eq: (left: Node, _gt: Node, right: Node): ComparisonExpression =>
         new ComparisonExpression('==', left.tree, right.tree),
 
+    CmpExpr_neq: (left: Node, _gt: Node, right: Node): ComparisonExpression =>
+        new ComparisonExpression('!=', left.tree, right.tree),
+
     CmpExpr_gt: (left: Node, _gt: Node, right: Node): ComparisonExpression =>
         new ComparisonExpression('>', left.tree, right.tree),
 

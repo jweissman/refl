@@ -1,0 +1,20 @@
+# spec.refl
+
+class Expectation {
+    initialize(val) { self.value = val }
+    # not() { return(Expectation.new(self.value, negated)) }
+    toEqual(other) { 
+        eq = self.value == other
+        if (!eq) {
+            print("expected " + other + " to equal " + self.value)
+        }
+    }
+}
+
+expect = (value) => Expectation.new(value)
+
+expect(true).toEqual(true)
+expect(true).not().toEqual(false)
+
+expect(1).toEqual(0)
+expect({a:1}).not().toEqual({a:1})
