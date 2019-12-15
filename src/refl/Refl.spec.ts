@@ -1,11 +1,16 @@
-import Refl from "./Refl"
+import refl, { Refl } from "./Refl"
+import interpreter from "./ReflInterpreter";
 
 describe(Refl, () => {
-    let refl: Refl;
     beforeEach(() => {
         Refl.tracedOutput = [];
-        refl = new Refl();
         Refl.suppressOutput = true;
+        interpreter.machine.stack = []
+    })
+
+    afterEach(() => {
+        // one test is failing this, would be interesting to investigate!
+        // expect(interpreter.machine.stack.length).toEqual(0)
     })
 
     describe("comments", () => {
@@ -287,7 +292,7 @@ describe(Refl, () => {
         refl.interpret('set=(i)=>{arr[i]=5;arr[i]}')
         expect(refl.interpret("set(4)")).toEqual(5)
         expect(refl.interpret("arr")).toEqual([1,2,3,4,5])
-        expect(refl.interpreter.machine.stack.length).toEqual(0)
+        expect(interpreter.machine.stack.length).toEqual(0)
     })
 
     it("associative arrays", () => {
@@ -320,11 +325,11 @@ describe(Refl, () => {
         it('construct keeps a clear stack', () => {
             refl.interpret("class Zap { print('laser sound') }")
             refl.interpret("zap = Zap.new")
-            expect(refl.interpreter.machine.stack.length).toEqual(0)
+            expect(interpreter.machine.stack.length).toEqual(0)
 
             refl.interpret("class Bam { initialize() { 2+2; 3+4; 5+8 }}")
             refl.interpret("bam = Bam.new")
-            expect(refl.interpreter.machine.stack.length).toEqual(0)
+            expect(interpreter.machine.stack.length).toEqual(0)
         })
 
         it('calls niladic member methods', () => {
@@ -405,8 +410,7 @@ describe(Refl, () => {
             expect(refl.interpret('cybertruck.year')).toEqual(3001)
             refl.interpret('cybertruck.year = 10000')
             expect(refl.interpret('cybertruck.year')).toEqual(10000)
-
-            expect(refl.interpreter.machine.stack.length).toEqual(0)
+            expect(interpreter.machine.stack.length).toEqual(0)
         });
 
         // can ask what class this is
@@ -445,10 +449,43 @@ describe(Refl, () => {
         expect(refl.interpret("len([1,2,3,4,5])")).toEqual(5)
         expect(refl.interpret("len([1,2,3,4,5])+5")).toEqual(10)
         expect(refl.interpret("5+len([1,2,3,4,5])")).toEqual(10)
+        expect(interpreter.machine.stack.length).toEqual(0)
     })
 
-    test.todo("tree literal (xhtml structure)")
-    test.todo("imports (use x from y)")
+    it("two dimensional arrays", () => {
+        refl.interpret("c=[[1,2],[3,4]]")
+        expect(refl.interpret("c[0][0]")).toEqual(1)
+        expect(refl.interpret("c[0][1]")).toEqual(2)
+        expect(refl.interpret("c[1][0]")).toEqual(3)
+        expect(refl.interpret("c[1][1]")).toEqual(4)
+    })
+
+    describe("imports", () => {
+        it('stdlib', () => {
+            refl.interpret("using 'paint'");
+            expect(refl.interpret("paint.red('town')")).toEqual("\u001b[31mtown\u001b[0m")
+            expect(refl.interpret("paint.blue('sky')")).toEqual("\u001b[34msky\u001b[0m")
+            expect(refl.interpret("paint.green('land')")).toEqual("\u001b[32mland\u001b[0m")
+            expect(interpreter.machine.stack.length).toEqual(0)
+
+            refl.interpret("using 'spec'");
+            refl.interpret("expect(1).toEqual(0)")
+            expect(Refl.tracedOutput[0]).toMatch("Expected 0 to equal 1")
+        });
+    })
+
+    test.todo("yield")
+
+    test.todo("blocks as objects")
+
+    test.todo("as_instance_method (instance_exec)")
+    test.todo("array methods (push/pop, len)")
+
+    xit("tree literal (xhtml structure)", () => {
+        refl.interpret('tree=<root><leaf/></root>')
+        expect(refl.interpret('tree.root')).toEqual('<leaf/>')
+    })
+
     test.todo("@ member access (self sugar)")
     test.todo("default parameter values")
 

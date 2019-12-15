@@ -1,6 +1,7 @@
 import { ReflNode, ReflProgram } from './lang/ReflNode';
 import { Interpreter, SimpleAlgebra, instruct, MyrBoolean, prettyProgram, MyrNil } from 'myr';
 import { Compiler } from 'myr/src/myr/vm/Interpreter';
+import refl, { Refl } from './Refl';
 
 let integerAlgebra = new SimpleAlgebra();
 
@@ -22,7 +23,7 @@ class ReflCompiler extends Compiler<ReflNode> {
 }
 let compiler = new ReflCompiler();
 
-export class ReflInterpreter extends Interpreter<ReflNode> {
+class ReflInterpreter extends Interpreter<ReflNode> {
     // interpreter: Interpreter<ReflNode> = new Interpreter<ReflNode>(integerAlgebra, compiler);
 
     constructor() {
@@ -37,6 +38,15 @@ export class ReflInterpreter extends Interpreter<ReflNode> {
     }
 
     interpret(program: ReflNode[]): any {
+        let result = this.evaluate(program);
+        if (result != null) {
+            return result.toJS();
+        } else {
+            return '';
+        }
+    }
+
+    evaluate(program: ReflNode[]): any {
         let instructions = program.flatMap(elem => elem.instructions)
         let code: ReflProgram = [
             instruct('noop', { label: 'main' }),
@@ -45,6 +55,10 @@ export class ReflInterpreter extends Interpreter<ReflNode> {
         let executable = [ ...stripMain(this.activeProgram), ...code ];
         // console.log("\n\n--- EXECUTE ---", "\n\n" + prettyProgram(executable), "=========\n\n")
         this.run(executable)
-        return this.result;
+        let { rawResult } = this;
+        return rawResult;
     }
 }
+
+const interpreter = new ReflInterpreter();
+export default interpreter;

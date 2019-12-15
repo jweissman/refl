@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node --project tsconfig.production.json
 
-import Refl from '../src/refl/Refl';
-let refl = new Refl();
+import refl from '../src/refl/Refl';
+// let refl = new Refl();
 
 const args = process.argv.slice(2);
 if (args.length === 0) {

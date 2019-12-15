@@ -21,7 +21,7 @@ export class AssignmentExpression extends ReflNode {
                 // based on the type of the thing on the right...
 
                 instruct('store', { key: this.left.name }),
-                // instruct('pop'),
+                instruct('pop'),
             ]
         } else if (this.left instanceof ArrayLookup) {
             let { array, index } = this.left;

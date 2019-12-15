@@ -1,0 +1,76 @@
+# spec.refl
+using 'paint'
+# using 'mirror'
+
+arr_push = (arr,elem) => arr[len(arr)]=elem
+
+class Expect {
+    passed = false
+    initialize(actual) { self.actual = actual }
+    fail() { self.passed = false }
+    # not() { return(Expectation.new(self.value, negated)) }
+    toEqual(expected) { 
+        eq = self.actual == expected
+        if (!eq) {
+            self.fail()
+            println(
+                paint.red("Expected " + expected + " to equal " + self.actual)
+            )
+        }
+    }
+}
+
+class It {
+    expectations = []
+
+    initialize(msg,fn) {
+        self.msg = msg;
+        self.fn = fn;
+        fn(self)
+        # self.report()
+    }
+
+    pect = (value) => {
+        expectation = Expect.new(value)
+        # yield expectation
+        arr_push(self.expectations,expectation)
+        expectation
+    }
+
+    report() {
+        passed=0;
+        failed=0;
+        i=0;
+        max=len(self.expectations)
+        while(i<max) {
+            spec = self.expectations[i]
+            #print(spec)
+            did_fail = spec.passed
+            print(i,"failed?",did_fail)
+            if (did_fail) {
+              failed = failed + 1
+            }
+            i=i+1;
+        }
+        println(failed + " failed")
+        if (failed == 0) {
+            println(paint.green("all good!"))
+        }
+    }
+}
+
+# describe = (msg, fn) => Description.new(msg, fn)
+it = (msg, fn) => It.new(msg, fn)
+
+expect = (v) => Expect.new(v)
+
+# it('spec lang', (ex) => {
+#   ex.pect(true).toEqual(true)
+#   ex.pect(true).toEqual(false)
+# }) #.report()
+
+# expect(true).toEqual(true)
+# expect(true).not().toEqual(false)
+
+# expect(1).toEqual(0)
+# expect({a:1}).not().toEqual({a:1})

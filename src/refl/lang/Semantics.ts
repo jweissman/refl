@@ -9,6 +9,7 @@ import { FunctionInvocation } from './FunctionInvocation';
 import { ComparisonExpression } from './ComparisonExpression';
 import { ConditionalExpression } from './ConditionalExpression';
 import { UnaryExpression } from './UnaryExpression';
+import { UsingExpression } from './UsingExpression';
 import { LogicalExpression } from './LogicalExpression';
 import { Program } from './Program';
 import { StringLiteral } from './StringLiteral';
@@ -63,6 +64,10 @@ const tree = {
 
     While: (_while: Node, _lp: Node, test: Node, _rp: Node, block: Node): WhileExpression => {
         return new WhileExpression(test.tree, block.tree)
+    },
+
+    Using: (_using: Node, path: Node): UsingExpression => {
+        return new UsingExpression(path.tree);
     },
 
     Conditional_ternary: (

@@ -1,0 +1,20 @@
+class Collection {
+    initialize(arr) {
+        self.arr = arr || []
+    }
+
+    all() { self.arr }
+
+    count() { len(self.arr) }
+
+    push(it) {
+        at = self.count()
+        self.arr[at] = it
+    }
+}
+
+fruit = Collection.new()
+fruit.push("banana")
+fruit.push("apple")
+fruit.push("strawberry")
+println(fruit.all())

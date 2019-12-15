@@ -1,5 +1,5 @@
 import { ReflNode, ReflProgram, ReflInstruction } from './ReflNode';
-import Refl from '../Refl';
+import { Refl } from '../Refl';
 import { Identifier } from './Identifier';
 import { instruct } from 'myr';
 
@@ -26,6 +26,9 @@ export class FunctionInvocation extends ReflNode {
                     { jsMethod: builtin, arity: this.paramList.length }
                 );
                 return [...this.pushArgs(), callBuiltin]
+            // } else if (id.name === 'fail') {
+            //     throw new Error("FAIL")
+            //     return [];
             } else if (id.name === 'return') {
                 // handle return here, that should be okay right? :D
                 // note: almost certainly better as keyword...

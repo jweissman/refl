@@ -9,7 +9,7 @@ Refl {
       | Conditional
       | Defun
       | Defclass
-      | While
+      | Keyword
       | CmpExpr
 
 	  Block = "{" Program "}"
@@ -19,8 +19,15 @@ Refl {
       | "if" "(" Expr ")" Block "else" Block -- if_else
       | "if" "(" Expr ")" Block -- if
 
+    Keyword
+      = While
+      | Using
+
     While
      = "while" "(" Expr ")" Block 
+    
+    Using
+     = "using" StringLit
 
     Defun = ident Lambda
     Defclass = "class" ident Block
@@ -86,7 +93,8 @@ Refl {
     ArrayLit
       = "[" ListOf<Expr, ","> "]"
     
-    ArrayIndex = (Funcall | ArrayIndex | ident) "[" Expr "]"
+    ArrayIndex
+      = Receiver "[" Expr "]"
     
     Funcall
       = (Funcall | ident) "(" ListOf<Expr, ","> ")"
@@ -94,17 +102,20 @@ Refl {
     DotAccess
       = (DotAccess | Funcall | ident) "." Funcall -- method
       | (DotAccess | Funcall | ident) "." ident -- property
+    
+    Receiver
+      = DotAccess | Funcall | ArrayIndex | ident
 
     StringLit
       = "'" #singleStringCharacter* "'"
       | "\"" #doubleStringCharacter* "\""
 
     singleStringCharacter
-      = ~("\'" | "\\" | "\n") #sourceCharacter -- non_escaped
+      = ~("\'" | "\\" | "\n") sourceCharacter -- non_escaped
       | "\\" unicodeLiteral                   -- escaped
    
     doubleStringCharacter
-      = ~("\"" | "\\" | "\n") #sourceCharacter -- non_escaped
+      = ~("\"" | "\\" | "\n") sourceCharacter -- non_escaped
       | "\\" unicodeLiteral                   -- escaped
     
     sourceCharacter = any
@@ -113,12 +124,14 @@ Refl {
       = "u" hexDigit hexDigit hexDigit hexDigit
 
     ident
-      = (~keyword) letter alnum*
+      = (~keyword) (letter | "_") (alnum | "_")*
     
     number
       = digit+
 
-    keyword = "while"
+    keyword
+      = "while"
+      | "using"
 
 	  space := whitespace | lineTerminator | comment  
     // Override Ohm's built-in definition of space.

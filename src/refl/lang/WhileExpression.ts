@@ -12,6 +12,7 @@ export default class WhileExpression extends ReflNode {
         let labelBegin = `while-${w}-begin`,
             labelEnd   = `while-${w}-end`
         return [
+            instruct('mark'),
             instruct('noop', { label: labelBegin }),
             ...this.test.instructions, // true/false
             instruct('push', { value: new MyrBoolean(false) }),
@@ -21,6 +22,7 @@ export default class WhileExpression extends ReflNode {
             ...this.block.instructions,
             instruct('jump', { target: labelBegin }),
             instruct('noop', { label: labelEnd }),
+            instruct('sweep'),
         ];
     }
 

@@ -1,0 +1,8 @@
+# class Mirror {
+#     initialize(subject) { self.subject = subject }
+#     
+#     as_subject(method, ...args) {
+#         fn = as_instance_method_of(self.subject, method)
+#         fn(...args)
+#     }
+# }

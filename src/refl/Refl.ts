@@ -2,11 +2,12 @@ import Grammar from './lang/Grammar';
 import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
 import chalk from 'chalk';
-import { ReflInterpreter } from './ReflInterpreter';
+import interpreter from './ReflInterpreter';
 import { prettyProgram, MyrObject, MyrNil, MyrString, MyrArray, MyrNumeric, } from 'myr';
+import { ReflNode } from './lang/ReflNode';
 
-export default class Refl {
-    interpreter = new ReflInterpreter();
+export class Refl {
+    static fileExtension = ".refl"
     static tracedOutput: string[] = []
     static suppressOutput: boolean = false
 
@@ -43,7 +44,6 @@ export default class Refl {
             let printableArgs: string[] = args.map(arg => arg !== undefined &&
                 (arg.toJS())
             )
-            // console.log(...printableArgs);
             if (!Refl.suppressOutput) {
                 process.stdout.write(printableArgs.join(""));
             }
@@ -52,26 +52,26 @@ export default class Refl {
         },
     }
 
-    interpret(input: string) {
-        if (input.trim().length === 0) { return; }
+    static tree(input: string): ReflNode[] {
+        if (input.trim().length === 0) { return []; }
         let match = Grammar.match(input.trim());
         if (match.succeeded()) {
             let semanteme: Dict = Semantics(match);
-            try {
-                let value = this.interpreter.interpret(semanteme.tree);
-                // this.interpreter.interpreter.machine.pop();
-                return value;
-            } catch(e) {
-                console.log("NAME OF ERR: '" + e.name + "'");
-                console.log(chalk.red("Error: " + e.message));
-                throw(e);
-            }
+            return semanteme.tree;
         } else {
             console.debug(chalk.blue(match.message))
             throw new SyntaxError(match.shortMessage)
-            // console.log(chalk.red("Syntax error found at " + match.shortMessage))
         }
-        return '...';
+ 
+    }
+
+    evaluate(input: string): MyrObject {
+        let ast = Refl.tree(input);
+        return interpreter.evaluate(ast) || new MyrNil();
+    }
+
+    interpret(input: string) {
+        return this.evaluate(input).toJS();
     }
 
     repl() {
@@ -96,25 +96,23 @@ export default class Refl {
                     }
                 }
                 cb(null, out)
-                // if (out !== undefined) { cb(null, out) }
-                // else { cb(null,null)}
             }
         })
 
         server.defineCommand('code', {
             help: 'Echo current program instructions',
-            action: () => { console.log(prettyProgram(this.interpreter.code)) }
+            action: () => { console.log(prettyProgram(interpreter.code)) }
         })
 
         server.defineCommand('stack', {
             help: 'Dump current stack elements',
-            action: () => { console.log(this.interpreter.machine.stack) }
+            action: () => { console.log(interpreter.machine.stack) }
         })
 
         server.defineCommand('trace', {
             help: 'Activate code trace',
             action: () => {
-                this.interpreter.trace = true;
+                interpreter.trace = true;
                 console.log(chalk.blue("(trace activated)"));
             }
         })
@@ -122,10 +120,13 @@ export default class Refl {
         server.defineCommand('notrace', {
             help: 'Deactivate code trace',
             action: () => {
-                this.interpreter.trace = false;
+                interpreter.trace = false;
                 console.log(chalk.blue("(trace deactivated)"));
             }
         })
 
     }
 }
+
+const refl = new Refl();
+export default refl;
