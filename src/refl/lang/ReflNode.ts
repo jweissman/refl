@@ -8,4 +8,5 @@ export abstract class ReflNode {
     compile(): ReflProgram {
         throw new Error("ReflNode#compile -- Method not implemented.");
     }
+    // abstract inspect(): string;
 }

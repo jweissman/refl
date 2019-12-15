@@ -8,6 +8,6 @@ fibm(x){
     return(fmemo[x]);
 }
 i = 0;
-max = 85;
-while (i<max) { i=i+1; print(fib(i)); }
-print(fmemo)
+max = 100;
+while (i<max) { i=i+1; println(fib(i)); }
+println(fmemo)

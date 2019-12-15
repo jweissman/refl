@@ -2,6 +2,7 @@ import { assertNever } from 'assert-never';
 import { ReflNode, ReflProgram } from './ReflNode';
 import { ComparatorOp } from './ComparatorOp';
 import { instruct, OpCode } from 'myr';
+import { Program } from './Program';
 
 export class ComparisonExpression extends ReflNode {
     constructor(public cmpOp: ComparatorOp, public left: ReflNode, public right: ReflNode) {
@@ -17,7 +18,7 @@ export class ComparisonExpression extends ReflNode {
         ]
     }
 
-    private get operation(): string {
+    protected get operation(): string {
         let message;
         switch (this.cmpOp) {
             case '>':
@@ -41,5 +42,20 @@ export class ComparisonExpression extends ReflNode {
             default: assertNever(this.cmpOp);
         }
         return message as string;
+    }
+}
+
+export class StackComparison extends ComparisonExpression {
+    constructor(public cmpOp: ComparatorOp, public left: ReflNode) {
+        super(cmpOp, left, new Program([]));
+    }
+
+    get instructions(): ReflProgram {
+        let compare = instruct(`cmp_${this.operation}` as OpCode);
+        return [
+            ...this.left.instructions,
+            // ...this.right.instructions, // assume right is on the stack...
+            compare,
+        ]
     }
 }

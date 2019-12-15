@@ -1,19 +1,24 @@
-class Collection {
-    initialize(arr) {
-        self.arr = arr || []
+class List {
+    initialize() {
+        self.arr = []
     }
 
     all() { self.arr }
 
-    count() { len(self.arr) }
+    count() { 
+        num=len(self.all())
+        println("count", num)
+        num
+    }
 
     push(it) {
+        println("PUSH", it)
         at = self.count()
         self.arr[at] = it
     }
 }
 
-fruit = Collection.new()
+fruit = List.new()
 fruit.push("banana")
 fruit.push("apple")
 fruit.push("strawberry")

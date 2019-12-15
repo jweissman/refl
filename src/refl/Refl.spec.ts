@@ -190,8 +190,6 @@ describe(Refl, () => {
             });
         })
 
-        test.todo('conditionals with unless/else')
-
         describe("boolean algebra", () => {
             it('true/false', () => {
                 expect(refl.interpret("true")).toEqual(true)
@@ -244,9 +242,7 @@ describe(Refl, () => {
                 expect(Refl.tracedOutput).toEqual([1, 2, 3])
             })
 
-            test.todo('with until')
             test.todo('with for')
-            test.todo('with upto/downto')
         });
     })
 
@@ -474,9 +470,38 @@ describe(Refl, () => {
         });
     })
 
-    test.todo("yield")
+    describe('short-circuits', () => {
+        beforeEach(() => {
+            refl.interpret("a=()=>{print('a');true}")
+            refl.interpret("b=()=>{print('b');false}")
+            refl.interpret("c=()=>{print('c');false}")
+        })
+        it('&&', () => {
+            expect(refl.interpret("a()&&b()&&c()")).toEqual(false)
+            expect(Refl.tracedOutput).toEqual(['a','b'])
+        })
+        it('||', () => {
+            expect(refl.interpret("c()||b()||a()")).toEqual(true)
+            expect(Refl.tracedOutput).toEqual(['c','b','a'])
+        })
+    })
+
+
+    xit('checks fn arity before invocation', () => {
+        refl.interpret('double=(x)=>2*x')
+        expect(()=>refl.interpret("double(2,3)")).toThrow()
+    })
+
+    it("array has native .length property/function", () => {
+        expect(refl.interpret("arr=[1,2,3];arr.length()")).toEqual(3)
+    })
+    test.todo("objects can call into own js methods")
+    test.todo("arrays and hashes are enumerable")
+    test.todo("tuple type?")
+    // test.todo("arrays and hashes are 'kernel' objects (can call into own js methods somehow?)")
 
     test.todo("blocks as objects")
+    test.todo("yield to block")
 
     test.todo("as_instance_method (instance_exec)")
     test.todo("array methods (push/pop, len)")

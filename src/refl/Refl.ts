@@ -13,6 +13,7 @@ export class Refl {
 
     static builtins: { [key: string]: Function } = {
         len: (arr: MyrArray | MyrString) => {
+            // console.log("LEN");
             let len: MyrObject =new MyrNil();
             if (arr instanceof MyrArray) {
                 len = new MyrNumeric(arr.elements.length);
@@ -36,8 +37,9 @@ export class Refl {
         ),
 
         println: (...args: any[]) => {
-            Refl.builtins.print(...args); //([...args,"\n"]));
+            let res = Refl.builtins.print(...args); //([...args,"\n"]));
             process.stdout.write("\n");
+            return res;
         },
 
         print: (...args: any[]) => {
@@ -48,7 +50,7 @@ export class Refl {
                 process.stdout.write(printableArgs.join(""));
             }
             Refl.tracedOutput.push(...printableArgs);
-            return new MyrNil();
+            return null; //new MyrNil();
         },
     }
 
