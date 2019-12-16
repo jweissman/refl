@@ -1,7 +1,6 @@
-class MyrArray {
+class List {
     initialize() {
-        # println("BUILD NEW ARRAY")
-        # self.each((e) => println(e))
+        # print("NEW LIST")
     }
 
     push(e) { self[self.length()]=e }
@@ -15,7 +14,6 @@ class MyrArray {
         }
     }
 }
-
 
 # fruit = List.new()
 # fruit.push("banana")

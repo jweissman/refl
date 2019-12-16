@@ -341,7 +341,7 @@ describe(Refl, () => {
                   hello(subj) { 'hi, ' + subj; }
               }
             `)
-            expect(refl.interpret("Greeter")).toEqual("MyrClass[Greeter]")
+            expect(refl.interpret("Greeter")).toEqual("Greeter")
             refl.interpret("g = Greeter.new()")
             // expect(refl.interpret("g = Greeter.new")).toBeInstanceOf(MyrObject)
             // refl.interpret("print(g)")
@@ -417,7 +417,7 @@ describe(Refl, () => {
                 }
             }`)
             refl.interpret("pasta = Food.new('Spaghetti', 680)");
-            expect(refl.interpret('pasta.class')).toEqual("MyrClass[Food]")
+            expect(refl.interpret('pasta.class')).toEqual("Food")
             expect(refl.interpret('pasta.class.name')).toEqual("Food")
         })
 
@@ -494,11 +494,11 @@ describe(Refl, () => {
 
     it('classes have classes', () => {
         refl.interpret("class A{}")
-        expect(refl.interpret("A.class")).toEqual('MyrClass[MyrClass]')
-        expect(refl.interpret("A.class.class")).toEqual('MyrClass[MyrClass]')
+        expect(refl.interpret("A.class")).toEqual('MyrClass')
+        expect(refl.interpret("A.class.class")).toEqual('MyrClass')
         refl.interpret("class B{}")
-        expect(refl.interpret("B.class")).toEqual('MyrClass[MyrClass]')
-        expect(refl.interpret("B.class.class")).toEqual('MyrClass[MyrClass]')
+        expect(refl.interpret("B.class")).toEqual('MyrClass')
+        expect(refl.interpret("B.class.class")).toEqual('MyrClass')
     })
 
     xit('objects share classes', () => {

@@ -142,6 +142,7 @@ export class ClassDefinition extends ReflNode {
             // instruct('jump_if_zero', { target: 'create-new-shared' }),
             // .shared=muPrime.instructions('shared')
             // need to check if we have an attribute..
+            // instruct('mark'),
             instruct('send_attr', { key: 'shared' }),
             instruct('store', { key: 'mu-prime' }),
             //     key: 'shared',
@@ -152,6 +153,7 @@ export class ClassDefinition extends ReflNode {
             instruct('load', { key }),
             instruct('load', { key: 'mu-prime' }),
             instruct('send_eq', { key: 'shared' }),
+            // instruct('sweep'),
 
             instruct('load', { key }),
         ]

@@ -45,3 +45,79 @@ so metaclasses (
 ) but also hyperclasses (
     'floating' classes 'internal' to every singleton (with a trait)?
 )
+
+----------------------------------------------------------------
+
+so -- keywords: class/traits/archetype
+
+
+traits can be mixed into classes and traits
+(is singleton/eigenclass a 'shadow' trait?)
+
+archetypes can be mixed into traits and archetypes
+
+--
+i can imagine template refl -- interpolating blocks anyway at first
+and then maybe a mechanism for structural templating -- instance_eval/do with blocks handy makes some of this straightforward
+but a templating -- maybe we get everything we would want meta wise without it??
+i'm just wondering if archetypes layer over a lot of concerns with templates/schemes/etc
+or rather could help uncover?
+
+okay so let's imagine some things
+
+Number and List and Set are all Printable but not all Enumerable
+
+Only Set and List share the Enumerable traits  that permit
+
+(Their superclass might be Collection, which might actually own the trait?)
+
+Maybe the archetype is something that lots of traits might share...
+
+So classes are nouns, traits are adjectives / archetypes are verbs? (a way to model functions categoreally,
+i.e., as diagrams?) 
+
+maybe they can represent certain kinds of side-effects for us and help
+keep them isolate? i'm imagining now a 'Write' archetype and a 'Read' archetype
+Enumerable needs them both, to interact structurally with arrays, but i can imagine that
+we could write a 'readonly' view -- i guess just thinking about immutable objects and
+how to permit that sort of structural difference -- 
+
+(now i'm imagining archetypes to be the sort of layer you use to do systems, network programming
+things -- structurally, higher-order than traits, and a way to isolate code that does network
+from code that doesn't?)
+
+okay, what would the write archetype be? does it 'generate' objects representing 
+the computation to be done, like a little lambda that reads or writes a value?
+
+and the read archetype is sort of the converse..
+
+(i'm not thinking about meta-circular eval at the archetype layer, if we model evaluation
+as generating a set of reads and writes (to objects, to the console)...)
+
+in other words, if mutating an object was a side effect too, we could model the end-to-end
+process as 'archetypical'... (user input/network/filesystem as read, write to objects, read
+from objects)
+
+[this seems interesting, something is working about it, i like the idea that archetypes are
+verbs and all this is amazing but idk about the specific model here? building up a thunk
+seems strange... but now that you mention it, a 'shallow' render of a tower of reflective objects
+seems kind of interesting -- we're an interpreter anyway, but being able to execute code in
+a 'dry run' kind of form seems powerful... -- quoted code obviously is kind of the same for us
+though?? how would an instance eval that takes a block work -- that's a more interesting question here]
+
+----------------------------------------------------------------
+
+i think the real targets are full formal modelling of class and object
+being able to create new ones (through new)
+sharing code between refl and js like with array for now
+work our way up the tree -- numbers, strings, hashes should all be wrapped
+
+being able to rename MyrArray to List seems useful though, or at least interesting
+(proving the reflection is 'thorough'?) -- 
+
+---
+
+
+
+
+(maybe modules are zero level and can be mixed into anything?)
