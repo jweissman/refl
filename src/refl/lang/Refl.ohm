@@ -1,7 +1,8 @@
 Refl {
     Program
-      = ListOf<Expr, delim*> delim*
+      = ListOf<Expr, delim?> delim*
     delim = ";" | lineTerminator
+    //lineTerminator
 
     Expr
       = Assignment
@@ -75,12 +76,13 @@ Refl {
       = 
       | "(" Expr ")" -- parens
       | "-" PriExpr -- neg 
-      | DotAccess
       | ArrayIndex
-  	  | Funcall
+      | DotAccess
+      | Lambda
       | ArrayLit
       | StringLit
       | HashLit
+      | Funcall
       | ident
       | number
     
@@ -97,14 +99,16 @@ Refl {
       = Receiver "[" Expr "]"
     
     Funcall
-      = (Funcall | ident) "(" ListOf<Expr, ","> ")"
+      = (Funcall | ident) Params
+
+    Params = "(" ListOf<Expr, ","> ")" 
 
     DotAccess
-      = (DotAccess | Funcall | ident) "." Funcall -- method
-      | (DotAccess | Funcall | ident) "." ident -- property
+      = Receiver "." Funcall -- method
+      | Receiver "." ident -- property
     
     Receiver
-      = DotAccess | Funcall | ArrayIndex | ident
+      = PriExpr
 
     StringLit
       = "'" #singleStringCharacter* "'"

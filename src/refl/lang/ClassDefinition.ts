@@ -1,4 +1,4 @@
-import { Assembler, instruct, MyrObject, MyrBoolean, MyrClass, MyrString } from "myr";
+import { classClass, Assembler, instruct, MyrObject, MyrBoolean, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
@@ -6,16 +6,21 @@ import { Program } from "./Program";
 import { FunctionLiteral } from "./FunctionLiteral";
 import { ComparisonExpression } from "./ComparisonExpression";
 
+
 let classCount = 0;
 
-class CreateObject extends ReflNode {
+class ConstructObject extends ReflNode {
     constructor(private name: string, private className?: string) {
         super();
     }
 
     get instructions(): ReflProgram {
+
         return [
-            instruct('construct'),
+            // ...(this.className
+            instruct('construct', { key: this.className }),
+                // instruct('construct'),
+            // ),
             instruct('store', { key: this.name }),
             instruct('pop'),
             ...(this.className ? [
@@ -86,7 +91,7 @@ export class ClassDefinition extends ReflNode {
         let instantiate = this.instantiate;
 
         let muPrime = (new Program([
-                new CreateObject("mu-prime"),
+                new ConstructObject("mu-prime"),
                 ...autoconstruct,
                 new LoadObject("mu-prime", [], false),
             ]))
@@ -96,15 +101,18 @@ export class ClassDefinition extends ReflNode {
             instruct('push', { value: new MyrBoolean(true) }),
             instruct('cmp'),
             instruct('jump_if_zero', { target: label }),
-            instruct('pop'),
+            // instruct('pop'),
 
             // define class obj
             instruct('push', { value: klass }),
             instruct('store', { key }),
 
+            // .jsMethods
+            // instruct('load', { })
+
             // .class
-            // instruct('push', { value: new MyrClass() }),
-            // instruct('send_eq', { key: 'class' }),
+            instruct('push', { value: classClass }),
+            instruct('send_eq', { key: 'class' }),
 
             instruct('noop', { label }),
             // instruct('load', { key }),
@@ -132,7 +140,7 @@ export class ClassDefinition extends ReflNode {
     get instantiate(): FunctionLiteral {
         let fn = new FunctionLiteral(this.ctorArgs,
             new Program([
-                new CreateObject("mu", this.id.name),
+                new ConstructObject("mu", this.id.name),
                 // ...autoconstruct,
                 new LoadObject("mu", this.ctorArgs.reverse(), this.hasInitializer),
             ]),

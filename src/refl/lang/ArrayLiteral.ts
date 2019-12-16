@@ -19,8 +19,12 @@ export class ArrayLiteral extends ReflNode {
             loadArr,
         ]);
         let construct = [
+            // instruct('load', { key: 'MyrArray'}),
+            // instruct('send_call', { key: 'new' }),
             instruct('push', { value: new MyrArray() }),
             // instruct('construct', { key: 'MyrArray' }),
+            // instruct('push', new MyrArray()),
+            // instruct('send_attr', { key: '.soul' }),
             // instruct('dup'),
             instruct('store', { key }),
             ...addElems,

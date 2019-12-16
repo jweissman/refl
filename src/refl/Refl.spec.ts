@@ -492,13 +492,19 @@ describe(Refl, () => {
         expect(()=>refl.interpret("double(2,3)")).toThrow()
     })
 
-    xit('classes have classes', () => {
+    it('classes have classes', () => {
         refl.interpret("class A{}")
-        expect(refl.interpret("A.class")).toEqual('MyrClass')
-        expect(refl.interpret("A.class.class")).toEqual('MyrObject')
+        expect(refl.interpret("A.class")).toEqual('MyrClass[MyrClass]')
+        expect(refl.interpret("A.class.class")).toEqual('MyrClass[MyrClass]')
         refl.interpret("class B{}")
-        expect(refl.interpret("B.class")).toEqual('MyrClass')
-        expect(refl.interpret("B.class.class")).toEqual('MyrObject')
+        expect(refl.interpret("B.class")).toEqual('MyrClass[MyrClass]')
+        expect(refl.interpret("B.class.class")).toEqual('MyrClass[MyrClass]')
+    })
+
+    xit('objects share classes', () => {
+        refl.interpret("class A{}; class B{}; class C{}")
+        // refl.interpret("a=[1,2];b=[3]")
+        // expect(refl.interpret("a.class == b.class")).toEqual(true)
     })
     
     it('reopens classes', () => {
@@ -523,6 +529,7 @@ describe(Refl, () => {
             expect(refl.interpret("arr=[1,2,3,4]; arr.push(5); arr")).toEqual([1, 2, 3, 4, 5])
         })
 
+        // todo...
         xit('each', () => {
             refl.interpret("arr=[1,2,3]")
             refl.interpret("arr.each((e)=>print(e))")

@@ -41,9 +41,11 @@ const tree = {
         return new DotAccess(obj.tree, message.tree);
     },
 
-    Funcall: (fn: Node, _lp: Node, paramList: Node, _rp: Node): FunctionInvocation => {
-        return new FunctionInvocation(fn.tree, paramList.tree);
+    Funcall: (fn: Node, params: Node): FunctionInvocation => {
+        return new FunctionInvocation(fn.tree, params.tree);
     },
+
+    Params: (_lp: Node, paramList: Node, _rp: Node) => paramList.tree,
 
     FunArgs: (_lp: Node, argList: Node, _rp: Node): string[] => {
         return argList.tree.map((id: Identifier) => id.name);

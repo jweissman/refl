@@ -1,4 +1,9 @@
 class MyrArray {
+    initialize() {
+        println("BUILD NEW ARRAY")
+        self.each((e) => println(e))
+    }
+
     each(fn) { 
         i=0;
         while (i<self.length()) {
