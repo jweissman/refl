@@ -1,4 +1,4 @@
-import { instruct, classClass, MyrBoolean, MyrClass, MyrString } from "myr";
+import { Assembler, instruct, classClass, MyrBoolean, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
@@ -89,7 +89,7 @@ export class ClassDefinition extends ReflNode {
         let instantiate = this.instantiate;
 
         let muPrime = (new Program([
-                new ConstructObject("mu-prime"),
+                // new ConstructObject("mu-prime"),
                 ...autoconstruct,
                 new LoadObject("mu-prime", [], false),
             ]))
@@ -128,7 +128,29 @@ export class ClassDefinition extends ReflNode {
 
             // .shared
             instruct('load', { key }),
+            // ...Assembler.if(
+            //     [instruct('responds_to', { key: 'shared' })],
+            //     // has shared already
+            //     [
+            //         instruct('send_attr', { key: 'shared'}),
+            //         instruct('store', { key: 'mu-prime'})
+            //     ],
+            //     (new ConstructObject("mu-prime")).instructions,
+            // ),
+            // instruct('push', { value: new MyrBoolean(true) }),
+            // instruct('cmp'),
+            // instruct('jump_if_zero', { target: 'create-new-shared' }),
+            // .shared=muPrime.instructions('shared')
+            // need to check if we have an attribute..
+            instruct('send_attr', { key: 'shared' }),
+            instruct('store', { key: 'mu-prime' }),
+            //     key: 'shared',
+            //     // onMissing: instruct('jump', { target:})
+            // }),
             ...muPrime.instructions,
+            // instruct('send', { key: 'meld' })
+            instruct('load', { key }),
+            instruct('load', { key: 'mu-prime' }),
             instruct('send_eq', { key: 'shared' }),
 
             instruct('load', { key }),

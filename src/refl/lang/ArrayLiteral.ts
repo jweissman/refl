@@ -1,7 +1,5 @@
 import { ReflNode, ReflProgram } from "./ReflNode";
-import { instruct, MyrArray, MyrNumeric } from "myr";
-import { FunctionInvocation } from "./FunctionInvocation";
-import { Identifier } from "./Identifier";
+import { instruct, arrayClass, MyrNumeric } from "myr";
 
 let arrCount = 0;
 export class ArrayLiteral extends ReflNode {
@@ -19,13 +17,8 @@ export class ArrayLiteral extends ReflNode {
             loadArr,
         ]);
         let construct = [
-            instruct('load', { key: 'MyrArray'}),
+            instruct('load', { key: arrayClass.name }),
             instruct('send_call', { key: 'new' }),
-            // instruct('push', { value: new MyrArray() }),
-            // instruct('construct', { key: 'MyrArray' }),
-            // instruct('push', new MyrArray()),
-            // instruct('send_attr', { key: '.soul' }),
-            // instruct('dup'),
             instruct('store', { key }),
             ...addElems,
         ]

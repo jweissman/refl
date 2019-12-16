@@ -80,7 +80,9 @@ export class Refl {
     }
 
     interpret(input: string) {
-        return this.evaluate(input).toJS();
+        let result = this.evaluate(input)
+        return (result instanceof MyrObject)
+            ? result.toJS() : result;
     }
 
     repl() {

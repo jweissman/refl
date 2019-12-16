@@ -31,3 +31,17 @@ it seems like we could do wrapped js objects with refl implementations that way,
 sure about that -- remember the goal was to achieve some way to call into native JS methods on the objects, which we've sort of
 achieved (not a generalized method for ffi still really!) but again it seems nicer to be able to implement (or start implementing) some
 of that in refl itself? esp arrays, native arrays should be a wrapped list class -- 
+
+
+---
+
+if traits are 'junction points' of classes/types
+then archetypes are 'junction points' of higher-order classes/metatypes
+
+a higher-order class is a "class of classes"
+so metaclasses (
+    shadow classes 'local' to an instance,
+    which may be a 'singleton' instance of the classes' class -- ...
+) but also hyperclasses (
+    'floating' classes 'internal' to every singleton (with a trait)?
+)

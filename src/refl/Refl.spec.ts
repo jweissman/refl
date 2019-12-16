@@ -516,7 +516,7 @@ describe(Refl, () => {
 
     test.todo('numbers are objects')
     
-    xit('(safely) reopens classes', () => {
+    it('(safely) reopens classes', () => {
         // i.e. class instances share bodies
         // does this mean rewriting all instances?
         // it's really just on dispatch
