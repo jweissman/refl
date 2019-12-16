@@ -440,7 +440,7 @@ describe(Refl, () => {
         })
     })
 
-    it("exec", () => {
+    xit("exec", () => {
         expect(refl.interpret("len([1,2])")).toEqual(2)
         expect(refl.interpret("len([1,2,3,4,5])")).toEqual(5)
         expect(refl.interpret("len([1,2,3,4,5])+5")).toEqual(10)
@@ -516,14 +516,19 @@ describe(Refl, () => {
 
     describe("array has 'native' functions", () => {
         it('length', () => {
-            expect(refl.interpret("arr=[1,2,3];arr.length()")).toEqual(3)
+            expect(refl.interpret("arr=[1,2,3]; arr.length()")).toEqual(3)
         });
-        xit('all', () => {
-            expect(refl.interpret("arr=[1,2,3];arr.all()")).toEqual([1,2,3])
-        });
-        xit('push', () => {
-            expect(refl.interpret("arr=[1,2,3,4];arr.push(5);arr")).toEqual([1, 2, 3, 4, 5])
+        
+        it('push', () => {
+            expect(refl.interpret("arr=[1,2,3,4]; arr.push(5); arr")).toEqual([1, 2, 3, 4, 5])
         })
+
+        xit('each', () => {
+            refl.interpret("arr=[1,2,3]")
+            refl.interpret("arr.each((e)=>print(e))")
+            expect(Refl.tracedOutput).toEqual("123")
+            // expect(refl.interpret("arr=[1,2,3]")).toEqual([1,23])
+        });
     })
     test.todo("objects can call into own js methods")
     test.todo("arrays and hashes are enumerable")

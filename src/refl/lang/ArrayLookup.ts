@@ -10,6 +10,7 @@ export class ArrayLookup extends ReflNode {
     get instructions(): ReflProgram {
         return [
             ...this.array.instructions,
+            // instruct('send_attr', { key: 'arr' }),
             ...this.index.instructions,
             instruct('arr_get'),
         ]

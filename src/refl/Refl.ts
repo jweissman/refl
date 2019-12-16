@@ -7,6 +7,10 @@ import { prettyProgram, MyrObject, MyrNil, MyrString, MyrArray, MyrNumeric, } fr
 import { ReflNode } from './lang/ReflNode';
 
 export class Refl {
+    bootstrap() {
+        this.interpret("using 'list'")
+    }
+
     static fileExtension = ".refl"
     static tracedOutput: string[] = []
     static suppressOutput: boolean = false
@@ -66,6 +70,9 @@ export class Refl {
         }
  
     }
+
+    constructor() { this.bootstrap(); }
+
 
     evaluate(input: string): MyrObject {
         let ast = Refl.tree(input);

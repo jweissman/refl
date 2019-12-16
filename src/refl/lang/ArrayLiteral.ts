@@ -20,6 +20,7 @@ export class ArrayLiteral extends ReflNode {
         ]);
         let construct = [
             instruct('push', { value: new MyrArray() }),
+            // instruct('construct', { key: 'MyrArray' }),
             // instruct('dup'),
             instruct('store', { key }),
             ...addElems,
