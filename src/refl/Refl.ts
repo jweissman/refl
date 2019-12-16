@@ -9,6 +9,7 @@ import { ReflNode } from './lang/ReflNode';
 export class Refl {
     bootstrap() {
         this.interpret("using 'list'")
+        this.interpret("using 'mirror'")
     }
 
     static fileExtension = ".refl"

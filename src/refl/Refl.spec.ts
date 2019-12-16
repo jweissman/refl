@@ -1,6 +1,12 @@
 import refl, { Refl } from "./Refl"
 import interpreter from "./ReflInterpreter";
 
+function assertEquals(input: string, result: any) {
+    expect(refl.interpret(input)).toEqual(result)
+}
+
+const assertTrue = (input: string) => assertEquals(input, true)
+
 describe(Refl, () => {
     beforeEach(() => {
         Refl.tracedOutput = [];
@@ -506,15 +512,28 @@ describe(Refl, () => {
         expect(refl.interpret("a.class == b.class")).toEqual(true)
         refl.interpret("class X{}; class Y{}; class Z{}")
         refl.interpret("x=X.new(); x1=X.new(); y=Y.new(); z=Z.new()")
-        expect("x.class != y.class").toEqual(true)
         expect("x.class == x1.class").toEqual(true)
+        expect("x.class != y.class").toEqual(true)
         expect("y.class != z.class").toEqual(true)
         expect("z.class != x.class").toEqual(true)
     })
 
+    it('mirrors', () => {
+        refl.interpret(`
+        mirror = Mirror.new();
+        list = mirror.conjure('List').new()
+        `)
+        expect(refl.interpret("list.class")).toEqual("List")
+    })
+
     // test.todo("arr sort")
 
-    test.todo('numbers are objects')
+    xit('numbers are objects', () => {
+        assertTrue("1.one()")
+        assertTrue("!1.one()")
+        assertTrue("0.zero()")
+        assertTrue("!0.zero()")
+    })
     
     it('(safely) reopens classes', () => {
         // i.e. class instances share bodies

@@ -1,0 +1,4 @@
+class Number {
+    zero() { self==0 }
+    one() { self==0 }
+}
