@@ -1,0 +1,11 @@
+class String {
+    reverse() {
+        i=0; max=self.length();
+        res=''
+        while(i<max) {
+            res=res+self[max-i-1]
+            i=i+1;
+        }
+        res
+    }
+}

@@ -1,5 +1,4 @@
-import { assertNever } from 'assert-never';
-import { OpCode, instruct } from 'myr';
+import { instruct } from 'myr';
 import { ReflNode, ReflProgram } from './ReflNode';
 import { BinaryOperator } from './BinaryOperator';
 
@@ -9,17 +8,11 @@ export class BinaryExpression extends ReflNode {
     }
 
     get instructions(): ReflProgram {
-        let opMap: { [key in BinaryOperator]: OpCode } = {
-            '+': 'add',
-            '-': 'sub',
-            '*': 'mul',
-            '/': 'div', 
-            '^': 'pow'
-        }
         return [
             ...this.left.instructions,
             ...this.right.instructions,
-            instruct(opMap[this.op]),
+            instruct('send_call', { key: this.op as string })
+            // instruct(opMap[this.op]),
         ]
     }
 }

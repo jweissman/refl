@@ -8,6 +8,8 @@ import { ReflNode } from './lang/ReflNode';
 
 export class Refl {
     bootstrap() {
+        this.interpret("using 'string'")
+        this.interpret("using 'number'")
         this.interpret("using 'list'")
         this.interpret("using 'mirror'")
     }

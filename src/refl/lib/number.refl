@@ -1,4 +1,8 @@
 class Number {
+    initialize() {
+        # println('create new number')
+    }
+
     zero() { self==0 }
-    one() { self==0 }
+    one() { self==1 }
 }

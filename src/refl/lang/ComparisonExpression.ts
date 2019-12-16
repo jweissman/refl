@@ -10,39 +10,44 @@ export class ComparisonExpression extends ReflNode {
     }
 
     get instructions(): ReflProgram {
-        let compare = instruct(`cmp_${this.operation}` as OpCode);
+        // let compare = instruct(`cmp_${this.operation}` as OpCode);
         return [
             ...this.left.instructions,
             ...this.right.instructions,
-            compare,
+            ...this.compare,
         ]
     }
 
-    protected get operation(): string {
-        let message;
-        switch (this.cmpOp) {
-            case '>':
-                message = 'gt';
-                break;
-            case '<':
-                message = 'lt';
-                break;
-            case '==':
-                message = 'eq';
-                break;
-            case '!=':
-                message = 'neq';
-                break;
-            case '>=':
-                message = 'gte';
-                break;
-            case '<=':
-                message = 'lte';
-                break;
-            default: assertNever(this.cmpOp);
-        }
-        return message as string;
+    protected get compare(): ReflProgram { 
+        // let message = this.operation;
+        return [instruct('send_call', { key: this.cmpOp })]
     }
+
+    // protected get operation(): string {
+    //     let message;
+    //     switch (this.cmpOp) {
+    //         case '>':
+    //             message = 'gt';
+    //             break;
+    //         case '<':
+    //             message = 'lt';
+    //             break;
+    //         case '==':
+    //             message = 'eq';
+    //             break;
+    //         case '!=':
+    //             message = 'neq';
+    //             break;
+    //         case '>=':
+    //             message = 'gte';
+    //             break;
+    //         case '<=':
+    //             message = 'lte';
+    //             break;
+    //         default: assertNever(this.cmpOp);
+    //     }
+    //     return message as string;
+    // }
 }
 
 export class StackComparison extends ComparisonExpression {
@@ -51,11 +56,11 @@ export class StackComparison extends ComparisonExpression {
     }
 
     get instructions(): ReflProgram {
-        let compare = instruct(`cmp_${this.operation}` as OpCode);
+        // let compare = instruct(`cmp_${this.operation}` as OpCode);
         return [
             ...this.left.instructions,
             // ...this.right.instructions, // assume right is on the stack...
-            compare,
+            ...this.compare,
         ]
     }
 }

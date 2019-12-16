@@ -1,0 +1,9 @@
+using 'paint'
+println(paint.red("red for all the roses"))
+println(paint.blue("as blue is for the sky"))
+println(paint.yellow("bright yellow for the sun above"))
+println(paint.green("deep green for trees to climb"))
+println(paint.magenta("cool magenta for the mountain range"))
+println(paint.cyan("and cyan for the dew"))
+println(paint.white("now together all the colors say"))
+println(paint.rainbow("THIS ReflUTION IS FOR YOU"))

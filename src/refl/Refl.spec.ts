@@ -462,17 +462,32 @@ describe(Refl, () => {
         expect(refl.interpret("c[1][1]")).toEqual(4)
     })
 
-    describe("imports", () => {
-        it('stdlib', () => {
-            refl.interpret("using 'paint'");
-            expect(refl.interpret("paint.red('town')")).toEqual("\u001b[31mtown\u001b[0m")
-            expect(refl.interpret("paint.blue('sky')")).toEqual("\u001b[34msky\u001b[0m")
-            expect(refl.interpret("paint.green('land')")).toEqual("\u001b[32mland\u001b[0m")
-            expect(interpreter.machine.stack.length).toEqual(0)
+    describe('core', () => {
+        it('mirrors', () => {
+            refl.interpret(`
+            mirror = Mirror.new();
+            list = mirror.conjure('List').new()
+            `)
+            expect(refl.interpret("list.class")).toEqual("List")
+        })
+    })
 
-            refl.interpret("using 'spec'");
-            refl.interpret("expect(1).toEqual(0)")
-            expect(Refl.tracedOutput[0]).toMatch("Expected 0 to equal 1")
+    describe("imports", () => {
+
+        describe('stdlib', () => {
+            it('paint', () => {
+                refl.interpret("using 'paint'");
+                expect(refl.interpret("paint.red('town')")).toEqual("\u001b[31mtown\u001b[0m")
+                expect(refl.interpret("paint.blue('sky')")).toEqual("\u001b[34msky\u001b[0m")
+                expect(refl.interpret("paint.green('land')")).toEqual("\u001b[32mland\u001b[0m")
+                expect(interpreter.machine.stack.length).toEqual(0)
+            });
+
+            it('spec', () => {
+                refl.interpret("using 'spec'");
+                refl.interpret("expect(1).toEqual(0)")
+                expect(Refl.tracedOutput[0]).toMatch("Expected 0 to equal 1")
+            });
         });
     })
 
@@ -500,9 +515,11 @@ describe(Refl, () => {
 
     it('classes have classes', () => {
         refl.interpret("class A{}")
+        expect(refl.interpret("A")).toEqual('A')
         expect(refl.interpret("A.class")).toEqual('MyrClass')
         expect(refl.interpret("A.class.class")).toEqual('MyrClass')
         refl.interpret("class B{}")
+        expect(refl.interpret("B")).toEqual('B')
         expect(refl.interpret("B.class")).toEqual('MyrClass')
         expect(refl.interpret("B.class.class")).toEqual('MyrClass')
     })
@@ -518,27 +535,30 @@ describe(Refl, () => {
         expect("z.class != x.class").toEqual(true)
     })
 
-    it('mirrors', () => {
-        refl.interpret(`
-        mirror = Mirror.new();
-        list = mirror.conjure('List').new()
-        `)
-        expect(refl.interpret("list.class")).toEqual("List")
-    })
+    
 
     // test.todo("arr sort")
 
-    xit('numbers are objects', () => {
-        assertTrue("1.one()")
-        assertTrue("!1.one()")
-        assertTrue("0.zero()")
-        assertTrue("!0.zero()")
+    it('numbers are objects', () => {
+        expect(refl.interpret("0.zero()")).toEqual(true)  
+        expect(refl.interpret("!0.one()")).toEqual(true)  
+        expect(refl.interpret("!1.zero()")).toEqual(true)
+        expect(refl.interpret("1.one()")).toEqual(true)
+        expect(refl.interpret("!2.zero()")).toEqual(true)
+        expect(refl.interpret("!2.one()")).toEqual(true)
     })
+
+    it('strings are objects', () => {
+        assertEquals("hi = 'hello, '; hi + 'world'", "hello, world")
+        expect(refl.interpret("hi.length()==7")).toEqual(true)
+        expect(refl.interpret("'time'.reverse()=='emit'")).toEqual(true)
+        expect(refl.interpret("'you'[0]=='y'")).toEqual(true)
+        expect(refl.interpret("'you'[1]=='o'")).toEqual(true)
+        expect(refl.interpret("'you'[2]=='u'")).toEqual(true)
+    })
+
     
     it('(safely) reopens classes', () => {
-        // i.e. class instances share bodies
-        // does this mean rewriting all instances?
-        // it's really just on dispatch
         refl.interpret('class Bar{}')
         refl.interpret('bar = Bar.new()')
         refl.interpret('class Bar{baz(){1}}')
@@ -551,7 +571,6 @@ describe(Refl, () => {
         expect(refl.interpret("newbar.quux()")).toEqual(2)
         expect(()=>refl.interpret("bar.quux()")).not.toThrow()
         expect(refl.interpret("bar.quux()")).toEqual(2)
-
         expect(()=>refl.interpret("newbar.baz()")).not.toThrow()
         expect(refl.interpret("newbar.baz()")).toEqual(1)
         expect(()=>refl.interpret("bar.baz()")).not.toThrow()
@@ -567,15 +586,14 @@ describe(Refl, () => {
             expect(refl.interpret("arr=[1,2,3,4]; arr.push(5); arr")).toEqual([1, 2, 3, 4, 5])
         })
 
-        // todo...
         it('each', () => {
             refl.interpret("arr=[1,2,3]")
             refl.interpret("arr.each((e)=>print(e))")
             expect(Refl.tracedOutput).toEqual([1,2,3])
-            // expect(refl.interpret("arr=[1,2,3]")).toEqual([1,23])
         });
     })
-    test.todo("objects can call into own js methods")
+
+    // test.todo("objects can call into own js methods")
     test.todo("arrays and hashes are enumerable")
     test.todo("tuple type?")
     // test.todo("arrays and hashes are 'kernel' objects (can call into own js methods somehow?)")
