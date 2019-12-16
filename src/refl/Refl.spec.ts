@@ -502,12 +502,21 @@ describe(Refl, () => {
     })
 
     xit('objects share classes', () => {
-        refl.interpret("class A{}; class B{}; class C{}")
-        // refl.interpret("a=[1,2];b=[3]")
-        // expect(refl.interpret("a.class == b.class")).toEqual(true)
+        refl.interpret("a=[1,2];b=[3]")
+        expect(refl.interpret("a.class == b.class")).toEqual(true)
+        refl.interpret("class X{}; class Y{}; class Z{}")
+        refl.interpret("x=X.new(); x1=X.new(); y=Y.new(); z=Z.new()")
+        expect("x.class != y.class").toEqual(true)
+        expect("x.class == x1.class").toEqual(true)
+        expect("y.class != z.class").toEqual(true)
+        expect("z.class != x.class").toEqual(true)
     })
+
+    // test.todo("arr sort")
+
+    test.todo('numbers are objects')
     
-    it('reopens classes', () => {
+    xit('(safely) reopens classes', () => {
         // i.e. class instances share bodies
         // does this mean rewriting all instances?
         // it's really just on dispatch
@@ -515,6 +524,16 @@ describe(Refl, () => {
         refl.interpret('bar = Bar.new()')
         refl.interpret('class Bar{baz(){1}}')
         refl.interpret('newbar = Bar.new()')
+        expect(refl.interpret("newbar.baz()")).toEqual(1)
+        expect(()=>refl.interpret("bar.baz()")).not.toThrow()
+        expect(refl.interpret("bar.baz()")).toEqual(1)
+        refl.interpret('class Bar{quux(){2}}')
+        expect(()=>refl.interpret("newbar.quux()")).not.toThrow()
+        expect(refl.interpret("newbar.quux()")).toEqual(2)
+        expect(()=>refl.interpret("bar.quux()")).not.toThrow()
+        expect(refl.interpret("bar.quux()")).toEqual(2)
+
+        expect(()=>refl.interpret("newbar.baz()")).not.toThrow()
         expect(refl.interpret("newbar.baz()")).toEqual(1)
         expect(()=>refl.interpret("bar.baz()")).not.toThrow()
         expect(refl.interpret("bar.baz()")).toEqual(1)
@@ -530,10 +549,10 @@ describe(Refl, () => {
         })
 
         // todo...
-        xit('each', () => {
+        it('each', () => {
             refl.interpret("arr=[1,2,3]")
             refl.interpret("arr.each((e)=>print(e))")
-            expect(Refl.tracedOutput).toEqual("123")
+            expect(Refl.tracedOutput).toEqual([1,2,3])
             // expect(refl.interpret("arr=[1,2,3]")).toEqual([1,23])
         });
     })

@@ -1,11 +1,9 @@
-import { classClass, Assembler, instruct, MyrObject, MyrBoolean, MyrClass, MyrString } from "myr";
+import { instruct, classClass, MyrBoolean, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
 import { Program } from "./Program";
 import { FunctionLiteral } from "./FunctionLiteral";
-import { ComparisonExpression } from "./ComparisonExpression";
-
 
 let classCount = 0;
 

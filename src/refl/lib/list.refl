@@ -1,13 +1,17 @@
 class MyrArray {
     initialize() {
-        println("BUILD NEW ARRAY")
-        self.each((e) => println(e))
+        # println("BUILD NEW ARRAY")
+        # self.each((e) => println(e))
     }
+
+    push(e) { self[self.length()]=e }
 
     each(fn) { 
         i=0;
-        while (i<self.length()) {
-            fn(self.get(i))
+        max=self.length()
+        while (i<max) {
+            fn(self[i])
+            i=i+1;
         }
     }
 }
