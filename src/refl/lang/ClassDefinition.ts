@@ -1,12 +1,15 @@
-import { instruct, MyrObject, MyrClass, MyrString } from "myr";
+import { Assembler, instruct, MyrObject, MyrBoolean, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
 import { Program } from "./Program";
 import { FunctionLiteral } from "./FunctionLiteral";
+import { ComparisonExpression } from "./ComparisonExpression";
+
+let classCount = 0;
 
 class CreateObject extends ReflNode {
-    constructor(private name: string, private className: string) {
+    constructor(private name: string, private className?: string) {
         super();
     }
 
@@ -14,8 +17,12 @@ class CreateObject extends ReflNode {
         return [
             instruct('construct'),
             instruct('store', { key: this.name }),
-            instruct('load', { key: this.className }),
-            instruct('send_eq', { key: 'class' }),
+            instruct('pop'),
+            ...(this.className ? [
+                instruct('load', { key: this.name }),
+                instruct('load', { key: this.className }),
+                instruct('send_eq', { key: 'class' }),
+            ] : []),
             instruct('mark'), // tombstone for construct
         ]
     }
@@ -63,62 +70,148 @@ class SelfAssignment extends AssignmentExpression {
 }
 
 export class ClassDefinition extends ReflNode {
+
+    hasInitializer: boolean = false
+    ctorArgs: string[] = []
     constructor(public id: Identifier, public body: Program) {
         super();
     }
 
     get instructions(): ReflProgram {
-        let klass = new MyrClass(this.id.name);
+        let key = this.id.name;
+        // console.log("instructions for class " + key)
+        let klass = new MyrClass(key);
+
+        let autoconstruct = this.autoconstruct;
+        let instantiate = this.instantiate;
+
+        let muPrime = (new Program([
+                new CreateObject("mu-prime"),
+                ...autoconstruct,
+                new LoadObject("mu-prime", [], false), // this.hasInitializer),
+            ]))
+        // console.log("mu-prime", { muPrime, autoconstruct, instantiate}) 
+        let label = `${key}-definition[${classCount++}]`
         return [
+            // ...Assembler.if(
+                // new ComparisonExpression(),
+            // )
+            //     // { instructions: () => [
+            //         // instruct('push', { value: klass }),
+            //     // ]}
+            // ),
+            instruct('exists', { key }),
+            instruct('push', { value: new MyrBoolean(true) }),
+            instruct('cmp'),
+            instruct('jump_if_zero', { target: label }),
+
             // define class obj
             instruct('push', { value: klass }),
-            instruct('store', { key: this.id.name }),
+            instruct('store', { key }),
+
+            // .class
+            // instruct('push', { value: new MyrClass(`MyrClass`) }),
+            // instruct('send_eq', { key: 'class' }),
+
+            instruct('noop', { label }),
+            // instruct('load', { key }),
+
             // .new
-            instruct('compile', { body: this.instantiate }),
+            instruct('load', { key }),
+            instruct('compile', { body: instantiate }),
             instruct('send_eq', { key: 'new' }),
+
             // .name
-            instruct('load', { key: this.id.name }),
-            instruct('push', { value: new MyrString(this.id.name) }),
+            instruct('load', { key }),
+            instruct('push', { value: new MyrString(key) }),
             instruct('send_eq', { key: 'name' }),
-            instruct('load', { key: this.id.name }),
+
+            // .shared
+            // instruct('compile', { body: define }),
+            // instruct('invoke'),
+            instruct('load', { key }),
+            ...muPrime.instructions,
+            instruct('send_eq', { key: 'shared' }),
+
+            instruct('load', { key }),
         ]
     }
 
     get instantiate(): FunctionLiteral {
-        let ctorArgs: string[] = []
-        let foundInit: boolean = false;
-        let autoconstruct = this.body.lines.flatMap(line => {
-            if (line instanceof AssignmentExpression) {
-                if (line.left instanceof Identifier) {
-                    if (line.right instanceof FunctionLiteral) {
-                        line.right.label = `${this.id.name}.${line.left.name}`;
-                        if (line.left.name === 'initialize') {
-                            ctorArgs = line.right.args;
-                            foundInit = true;
-                            // for (let i = 0; i < ctorArgs.length; i++) {
-                            // line.right.body.instructions.push(
-                            //     instruct("exec", { key: 'print' })
-                            // )
-                            // }
-                        // } else {
-                            // throw new Error("initialize should be a fn probably?")
-                        }
-                    }
-                }
-                return new SelfAssignment('mu', line.left, line.right);
-            } else {
-                return line;
-            }
-        })
+    //     return [
+    //         ...new CreateObject("mu", this.id.name),
+    //         ...new LoadObject("mu", ctorArgs.reverse(), foundInit),
+    //     ]
 
-        let fn = new FunctionLiteral(ctorArgs,
+        let fn = new FunctionLiteral(this.ctorArgs,
             new Program([
                 new CreateObject("mu", this.id.name),
-                ...autoconstruct,
-                new LoadObject("mu", ctorArgs.reverse(), foundInit),
+                // ...autoconstruct,
+                new LoadObject("mu", this.ctorArgs.reverse(), this.hasInitializer),
             ]),
         );
         fn.label = `${this.id.name}.new`;
         return fn;
     }
+
+    get autoconstruct(): ReflNode[] {
+        return this.body.lines.flatMap(line => {
+            if (line instanceof AssignmentExpression) {
+                if (line.left instanceof Identifier) {
+                    if (line.right instanceof FunctionLiteral) {
+                        line.right.label = `${this.id.name}.${line.left.name}`;
+                        if (line.left.name === 'initialize') {
+                            this.ctorArgs = line.right.args;
+                            this.hasInitializer = true;
+                        }
+                    }
+                }
+                return new SelfAssignment('mu-prime', line.left, line.right);
+            } else {
+                return line;
+            }
+        })
+    }
+
+    //get define(): FunctionLiteral {
+    //    // let ctorArgs: string[] = []
+    //    // let foundInit: boolean = false;
+    //    let autoconstruct = this.body.lines.flatMap(line => {
+    //        if (line instanceof AssignmentExpression) {
+    //            if (line.left instanceof Identifier) {
+    //                if (line.right instanceof FunctionLiteral) {
+    //                    line.right.label = `${this.id.name}.${line.left.name}`;
+    //                    if (line.left.name === 'initialize') {
+    //                        this.ctorArgs = line.right.args;
+    //                        this.hasInitializer = true;
+    //                        // for (let i = 0; i < ctorArgs.length; i++) {
+    //                        // line.right.body.instructions.push(
+    //                        //     instruct("exec", { key: 'print' })
+    //                        // )
+    //                        // }
+    //                    // } else {
+    //                        // throw new Error("initialize should be a fn probably?")
+    //                    }
+    //                }
+    //            }
+    //            return new SelfAssignment('mu-prime', line.left, line.right);
+    //        } else {
+    //            return line;
+    //        }
+    //    })
+
+    //    let fn = new FunctionLiteral([], //this.ctorArgs,
+    //        new Program([
+    //            // instruct('construct'),
+    //            // instruct('construct'),
+    //            // instruct
+    //            new CreateObject("mu-prime"),
+    //            // instruct('construct'),
+    //            ...autoconstruct,
+    //            new LoadObject("mu-prime", [], false), // this.hasInitializer),
+    //        ]),
+    //    );
+    //    fn.label = `${this.id.name}.define`;
+    //    return fn;
+    //}
 } 

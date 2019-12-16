@@ -22,3 +22,12 @@ some things we think might help us understand more:
 i think the tack will be to try to keep the core language very simple, and try to bootstrap into higher-order things
 
 build what we need to build out day-to-day programming things but keep evolving the concepts
+
+--
+
+okay, classes have a .shared (anonymous object for now) on which all functions live -- one implementation
+should enable us to do eigen but for now inheritance and really the goal was extension, how to get methods extending?
+it seems like we could do wrapped js objects with refl implementations that way, which would be interesting? i guess i'm still not
+sure about that -- remember the goal was to achieve some way to call into native JS methods on the objects, which we've sort of
+achieved (not a generalized method for ffi still really!) but again it seems nicer to be able to implement (or start implementing) some
+of that in refl itself? esp arrays, native arrays should be a wrapped list class -- 

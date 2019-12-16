@@ -492,8 +492,38 @@ describe(Refl, () => {
         expect(()=>refl.interpret("double(2,3)")).toThrow()
     })
 
-    it("array has native .length property/function", () => {
-        expect(refl.interpret("arr=[1,2,3];arr.length()")).toEqual(3)
+    xit('classes have classes', () => {
+        refl.interpret("class A{}")
+        expect(refl.interpret("A.class")).toEqual('MyrClass')
+        expect(refl.interpret("A.class.class")).toEqual('MyrObject')
+        refl.interpret("class B{}")
+        expect(refl.interpret("B.class")).toEqual('MyrClass')
+        expect(refl.interpret("B.class.class")).toEqual('MyrObject')
+    })
+    
+    it('reopens classes', () => {
+        // i.e. class instances share bodies
+        // does this mean rewriting all instances?
+        // it's really just on dispatch
+        refl.interpret('class Bar{}')
+        refl.interpret('bar = Bar.new()')
+        refl.interpret('class Bar{baz(){1}}')
+        refl.interpret('newbar = Bar.new()')
+        expect(refl.interpret("newbar.baz()")).toEqual(1)
+        expect(()=>refl.interpret("bar.baz()")).not.toThrow()
+        expect(refl.interpret("bar.baz()")).toEqual(1)
+    })
+
+    describe("array has 'native' functions", () => {
+        it('length', () => {
+            expect(refl.interpret("arr=[1,2,3];arr.length()")).toEqual(3)
+        });
+        xit('all', () => {
+            expect(refl.interpret("arr=[1,2,3];arr.all()")).toEqual([1,2,3])
+        });
+        xit('push', () => {
+            expect(refl.interpret("arr=[1,2,3,4];arr.push(5);arr")).toEqual([1, 2, 3, 4, 5])
+        })
     })
     test.todo("objects can call into own js methods")
     test.todo("arrays and hashes are enumerable")
