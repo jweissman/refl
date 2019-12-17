@@ -1,0 +1,4 @@
+class Boolean {
+    initialize(val) { self._set(val); }
+    false() { !self.true() }
+}

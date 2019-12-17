@@ -82,9 +82,14 @@ Refl {
       | ArrayLit
       | StringLit
       | HashLit
+      | BooleanLit
       | Funcall
       | ident
       | number
+    
+    BooleanLit
+      = "true" -- true
+      | "false" -- false
     
     HashLit
       = "{" ListOf<KeyValuePair, ","> "}"

@@ -24,13 +24,12 @@ class Paint {
     cyanBright(message) { self.colorBright(message, palette.cyan) }
 
     rainbow(message) {
-        chs = chars(message)
-        max=len(chs)
+        max=message.length()
         i=0
         str=""
         while(i<max) {
            clr = palette.red+rand(4)
-           print(self.colorBright(chs[i],clr))
+           print(self.colorBright(message[i],clr))
            i=i+1
         }
         str

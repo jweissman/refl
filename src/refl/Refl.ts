@@ -3,13 +3,14 @@ import Semantics from './lang/Semantics';
 import { Dict } from 'ohm-js';
 import chalk from 'chalk';
 import interpreter from './ReflInterpreter';
-import { prettyProgram, MyrObject, MyrNil, MyrString, MyrArray, MyrNumeric, } from 'myr';
+import { prettyProgram, MyrObject, MyrNil, MyrNumeric, } from 'myr';
 import { ReflNode } from './lang/ReflNode';
 
 export class Refl {
     bootstrap() {
         this.interpret("using 'string'")
         this.interpret("using 'number'")
+        this.interpret("using 'boolean'")
         this.interpret("using 'list'")
         this.interpret("using 'mirror'")
     }
@@ -19,26 +20,6 @@ export class Refl {
     static suppressOutput: boolean = false
 
     static builtins: { [key: string]: Function } = {
-        len: (arr: MyrArray | MyrString) => {
-            // console.log("LEN");
-            let len: MyrObject =new MyrNil();
-            if (arr instanceof MyrArray) {
-                len = new MyrNumeric(arr.elements.length);
-            } else if (arr instanceof MyrString) {
-                len = new MyrNumeric(arr.value.length);
-            }
-            // console.log("LEN", { arr, len })
-            return len;
-        },
-
-        chars: (s: MyrString) => {
-            let chars = new MyrArray(
-                s.value.split("").map(ch => new MyrString(ch))
-            );
-            // console.log("CHARS", chars)
-            return chars;
-        },
-
         rand: (n: MyrNumeric) => new MyrNumeric(
             Math.floor(Math.random()*(n.value+1))
         ),

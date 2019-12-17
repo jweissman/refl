@@ -20,6 +20,7 @@ import { ArrayLiteral } from './ArrayLiteral';
 import { ArrayLookup } from './ArrayLookup';
 import { HashLiteral } from './HashLiteral';
 import { KeyValuePair } from './KeyValuePair';
+import { BooleanLiteral } from './BooleanLiteral';
 
 const semantics: Semantics = Grammar.createSemantics();
 
@@ -181,6 +182,9 @@ const tree = {
     ArrayIndex: (id: Node, _lb: Node, index: Node, _rb: Node) => {
         return new ArrayLookup(id.tree, index.tree);
     },
+
+    BooleanLit_true: (_true: Node) => new BooleanLiteral(true),
+    BooleanLit_false: (_false: Node) => new BooleanLiteral(false),
 
     number: (element: Node): NumberLiteral =>
         new NumberLiteral(Number(element.sourceString)),

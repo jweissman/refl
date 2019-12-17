@@ -5,8 +5,6 @@ function assertEquals(input: string, result: any) {
     expect(refl.interpret(input)).toEqual(result)
 }
 
-const assertTrue = (input: string) => assertEquals(input, true)
-
 describe(Refl, () => {
     beforeEach(() => {
         Refl.tracedOutput = [];
@@ -427,6 +425,38 @@ describe(Refl, () => {
             expect(refl.interpret('pasta.class.name')).toEqual("Food")
         })
 
+        it('classes have classes', () => {
+            refl.interpret("class A{}")
+            expect(refl.interpret("A")).toEqual('A')
+            expect(refl.interpret("A.class")).toEqual('MyrClass')
+            expect(refl.interpret("A.class.class")).toEqual('MyrClass')
+            refl.interpret("class B{}")
+            expect(refl.interpret("B")).toEqual('B')
+            expect(refl.interpret("B.class")).toEqual('MyrClass')
+            expect(refl.interpret("B.class.class")).toEqual('MyrClass')
+        })
+
+        it('basic objects share classes', () => {
+            refl.interpret("a=[1,2];b=[3]")
+            expect(refl.interpret("a.class == b.class")).toEqual(true)
+            refl.interpret("c='hello';d='world'");
+            expect(refl.interpret("c.class == d.class")).toEqual(true)
+            expect(refl.interpret("a.class == c.class")).toEqual(false)
+            refl.interpret("e=9;f=21")
+            expect(refl.interpret("e.class == f.class")).toEqual(true)
+            expect(refl.interpret("a.class == e.class")).toEqual(false)
+        });
+
+        xit('nonbuiltins share classes', () => {
+            refl.interpret("class X{}; class Y{}; class Z{}")
+            refl.interpret("x=X.new(); x1=X.new(); y=Y.new(); z=Z.new()")
+            expect("x.class == x1.class").toEqual(true)
+            expect("x.class != y.class").toEqual(true)
+            expect("y.class != z.class").toEqual(true)
+            expect("z.class != x.class").toEqual(true)
+        })
+
+
         test.todo("class statics") // can def methods on Class instance
         test.todo("inheritance") // has ancestors
         // test.todo("refinement") // has eigenclass
@@ -512,30 +542,7 @@ describe(Refl, () => {
         refl.interpret('double=(x)=>2*x')
         expect(()=>refl.interpret("double(2,3)")).toThrow()
     })
-
-    it('classes have classes', () => {
-        refl.interpret("class A{}")
-        expect(refl.interpret("A")).toEqual('A')
-        expect(refl.interpret("A.class")).toEqual('MyrClass')
-        expect(refl.interpret("A.class.class")).toEqual('MyrClass')
-        refl.interpret("class B{}")
-        expect(refl.interpret("B")).toEqual('B')
-        expect(refl.interpret("B.class")).toEqual('MyrClass')
-        expect(refl.interpret("B.class.class")).toEqual('MyrClass')
-    })
-
-    xit('objects share classes', () => {
-        refl.interpret("a=[1,2];b=[3]")
-        expect(refl.interpret("a.class == b.class")).toEqual(true)
-        refl.interpret("class X{}; class Y{}; class Z{}")
-        refl.interpret("x=X.new(); x1=X.new(); y=Y.new(); z=Z.new()")
-        expect("x.class == x1.class").toEqual(true)
-        expect("x.class != y.class").toEqual(true)
-        expect("y.class != z.class").toEqual(true)
-        expect("z.class != x.class").toEqual(true)
-    })
-
-    
+   
 
     // test.todo("arr sort")
 
@@ -596,9 +603,16 @@ describe(Refl, () => {
     describe('object construction', () => {
         it('strings', () => {
             expect(refl.interpret("s=String.new('hello');s")).toEqual("hello")
+            expect(refl.interpret("String.new('hello').reverse()")).toEqual("olleh")
         });
-        xit('numbers', () => {
+        it('numbers', () => {
             expect(refl.interpret("n=Number.new(1);n")).toEqual(1)
+            expect(refl.interpret("Number.new(1).one()")).toEqual(true)
+        })
+        it('booleans', () => {
+            expect(refl.interpret("b=Boolean.new(true);b")).toEqual(true)
+            expect(refl.interpret("Boolean.new(true).true()")).toEqual(true)
+            expect(refl.interpret("Boolean.new(false).true()")).toEqual(false)
         })
         xit('lists', () => {
             expect(refl.interpret("l=List.new([1,2,3]);l")).toEqual([1, 2, 3])
@@ -641,6 +655,12 @@ describe(Refl, () => {
     test.todo("regex lits")
 
     describe('end-to-end', () => {
+        xit('examples', () => {
+            // refl.interpret("using 'examples/fib'");
+            refl.interpret("using 'examples/poem'");
+            // refl.interpret("using 'examples/tree'");
+        })
+
         it('fibonacci memo', () => {
             refl.interpret(`# fib.refl
             fmemo = []

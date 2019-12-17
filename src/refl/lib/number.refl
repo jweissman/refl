@@ -1,6 +1,6 @@
 class Number {
-    initialize() {
-        # println('create new number')
+    initialize(val) {
+        self._set(val)
     }
 
     zero() { self==0 }

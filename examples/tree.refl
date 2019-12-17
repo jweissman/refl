@@ -7,14 +7,15 @@ class Node {
         self.right = right;
     }
 
+    children() { [self.left,self.right]}
+
     visit(fn) {
         fn(self);
-        if (self.left != nil) {
-          self.left.visit(fn);
-        }
-        if (self.right != nil) {
-          self.right.visit(fn);
-        }
+        self.children().each((child) => {
+          if (child != nil) {
+            child.visit(fn);
+          }
+        })
     }
 }
 
@@ -22,4 +23,4 @@ one = Node.new("one",nil,nil)
 three = Node.new("three",nil,nil)
 two = Node.new("two",three,nil)
 root = Node.new("root",one, two)
-root.visit((node) => print(node.label))
+root.visit((node) => println(node.label))

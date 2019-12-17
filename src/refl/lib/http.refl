@@ -1,0 +1,18 @@
+# maybe start slower? do sockets first?
+# it's a lot of objects to wrap around, and maybe better to have (some/most) in refl anyway...
+# class Request {}
+# class Response {}
+# 
+# class Server {
+#     constructor(handler) {
+#         self.handler = handler
+#     }
+# 
+#     listen(host, port) { self._listen(host, port, handler) }
+# }
+# 
+# class HelloServer extends Server {
+#     constructor() { super(self.handle) }
+#     handle(req,rsp) {
+#     }
+# }
