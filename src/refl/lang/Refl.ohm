@@ -30,7 +30,8 @@ Refl {
     Using
      = "using" StringLit
 
-    Defun = ident Lambda
+    Defun = (ident | Op) Lambda
+    Op = "[]"
     Defclass = "class" ident Block
 
     Lambda

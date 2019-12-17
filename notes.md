@@ -121,3 +121,20 @@ being able to rename MyrArray to List seems useful though, or at least interesti
 
 
 (maybe modules are zero level and can be mixed into anything?)
+
+--------------
+
+what if archectypes are singletons but inject dependencies?
+i'm imagining a 'does database.write' which grants traits, marks this object as a db writer for isolation (??)
+and injects a concrete database instance lazily?
+maybe also archetypes unlock 'custom' dsls
+have always dreamed of weaponizing ohm somehow, exposing parsing to the user :D
+ofc this goes quickly down the meta-circular evaluation rabbithole
+we do want to stay focused on the goal
+but i was thinking: database.write could unlock a kind of native sql object...
+and does widget.render could unlock xml literals...
+acceessing the Database archetype directly could only build on whatever abstract mechanics are provided
+but you could implement a lot at that level
+(directly implementing AR primitives? extending them thoughtfully in the directino of your code)
+guardrails/guidelines for meta
+

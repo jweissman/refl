@@ -613,9 +613,16 @@ describe(Refl, () => {
             expect(refl.interpret("b=Boolean.new(true);b")).toEqual(true)
             expect(refl.interpret("Boolean.new(true).true()")).toEqual(true)
             expect(refl.interpret("Boolean.new(false).true()")).toEqual(false)
+            expect(refl.interpret("Boolean.new(true).false()")).toEqual(false)
+            expect(refl.interpret("Boolean.new(false).false()")).toEqual(true)
+        })
+        xit('hashes', () => {
+            expect(refl.interpret("h=Hash.new({a:1});h")).toEqual({a:1})
+            expect(refl.interpret("Hash.new({a:1,b:2}).keys")).toEqual(['a','b'])
         })
         xit('lists', () => {
             expect(refl.interpret("l=List.new([1,2,3]);l")).toEqual([1, 2, 3])
+            expect(refl.interpret("l.length")).toEqual(3)
         })
     })
 

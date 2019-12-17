@@ -3,8 +3,11 @@ class String {
         self._set(contents);
     }
 
+    all() { self.to_a() }
+    length() { self.all().length() }
+
     reverse() {
-        i=0; max=self.length();
+        i=0; max=self.all().length();
         res=''
         while(i<max) {
             res=res+self[max-i-1]
@@ -12,4 +15,21 @@ class String {
         }
         res
     }
+
+    # [](i) { self.to_a()[i] }
+
+    words() {
+        self.to_a().split(" ")
+    }
+
+    #split(delim) {
+    #    fragments = []
+    #    i=0; max=self.length();
+    #    fragment = ''
+    #    fragmentStart = 0
+    #    while(i<max) {
+    #        res=res+self[max-i-1]
+    #        i=i+1;
+    #    }
+    #}
 }

@@ -51,10 +51,15 @@ const tree = {
     FunArgs: (_lp: Node, argList: Node, _rp: Node): string[] => {
         return argList.tree.map((id: Identifier) => id.name);
     },
+    // FunArg: (_lp: Node, argList: Node, _rp: Node): string[] => {
+    //     return 
+    // },
 
     Defun: (id: Node, fn: Node) => {
         return new AssignmentExpression(id.tree, fn.tree);
     },
+
+    Op: (op: Node) => new Identifier(op.sourceString),
 
     Lambda_one: (args: Node, _arrow: Node, body: Node): FunctionLiteral =>
         new FunctionLiteral(args.tree, body.tree),

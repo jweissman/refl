@@ -18,8 +18,6 @@ export class AssignmentExpression extends ReflNode {
             }
             return [
                 ...this.right.instructions,
-                // based on the type of the thing on the right...
-
                 instruct('store', { key: this.left.name }),
                 instruct('pop'),
             ]
@@ -29,19 +27,15 @@ export class AssignmentExpression extends ReflNode {
                 ...array.instructions, // have loaded the array
                 ...index.instructions,
                 ...this.right.instructions,
-                // instruct('push', { value: new MyrNumeric(index) }), // push the index
                 instruct('arr_put'),
             ]
         } else if (this.left instanceof DotAccess) {
-            // assume send_eq? and we can check if a hash in the machine...
             let { object, message } = this.left;
             return [
                 ...object.instructions,
                 ...this.right.instructions,
                 instruct('send_eq', { key: (message as Identifier).name }),
-                // ...this.right.instructions,
             ]
-
         } else {
             throw new Error("Don't know how to assign to LHS "
                 + this.left.constructor.name)
