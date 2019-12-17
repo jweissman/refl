@@ -593,6 +593,20 @@ describe(Refl, () => {
         });
     })
 
+    describe('object construction', () => {
+        it('strings', () => {
+            expect(refl.interpret("s=String.new('hello');s")).toEqual("hello")
+        });
+        xit('numbers', () => {
+            expect(refl.interpret("n=Number.new(1);n")).toEqual(1)
+        })
+        xit('lists', () => {
+            expect(refl.interpret("l=List.new([1,2,3]);l")).toEqual([1, 2, 3])
+        })
+    })
+
+    test.todo("ranges")
+
     // test.todo("objects can call into own js methods")
     test.todo("arrays and hashes are enumerable")
     test.todo("tuple type?")
@@ -611,8 +625,6 @@ describe(Refl, () => {
 
     test.todo("@ member access (self sugar)")
     test.todo("default parameter values")
-
-    test.todo("ranges")
 
     test.todo("superclasses")
     test.todo("eigenclasses")

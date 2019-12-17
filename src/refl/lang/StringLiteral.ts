@@ -10,17 +10,18 @@ export class StringLiteral extends ReflNode {
         // return [ instruct('push', { value: new MyrString(value) }) ]
         let key = `str-${strCount++}`
         return [
-            instruct('mark'),
+            // instruct('mark'),
+            instruct('push', { value }),
             instruct('load', { key: stringClass.name }),
             instruct('send_call', { key: 'new' }),
             instruct('store', {key}),
             instruct('pop'),
-            instruct('push', { value }),
+            // instruct('push', { value }),
             
             // instruct('dump'),
-            instruct('load', { key }),
-            instruct('send_call', { key: '_set' }),
-            instruct('sweep'),
+            // instruct('load', { key }),
+            // instruct('send_call', { key: '_set' }),
+            // instruct('sweep'),
             instruct('load', { key }),
             // instruct('load', {key: 'mu-alpha'}),
             // instruct('load', {key: 'mu-alpha'}),

@@ -1,4 +1,8 @@
 class String {
+    initialize(contents) {
+        self._set(contents);
+    }
+
     reverse() {
         i=0; max=self.length();
         res=''

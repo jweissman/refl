@@ -3,6 +3,9 @@ class List {
         # print("NEW LIST")
     }
 
+    first() { self[0] }
+    last() { self[self.length()-1] }
+
     push(e) { self[self.length()]=e }
 
     each(fn) { 
@@ -14,9 +17,3 @@ class List {
         }
     }
 }
-
-# fruit = List.new()
-# fruit.push("banana")
-# fruit.push("apple")
-# fruit.push("strawberry")
-# println(fruit.all())

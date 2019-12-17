@@ -43,6 +43,7 @@ class LoadObject extends ReflNode {
     get instructions(): ReflProgram {
         let loadCtorArgs = 
             this.ctorArgs.map(arg => instruct('load', { key: arg}));
+        // console.log('load obj', { loadCtorArgs });
         return [
             instruct('sweep'), // cleanup (if there was anything left over from construct) 
             ...(this.callInit ? [
@@ -99,14 +100,10 @@ export class ClassDefinition extends ReflNode {
             instruct('push', { value: new MyrBoolean(true) }),
             instruct('cmp'),
             instruct('jump_if_zero', { target: label }),
-            // instruct('pop'),
 
             // define class obj
             instruct('push', { value: klass }),
             instruct('store', { key }),
-
-            // .jsMethods
-            // instruct('load', { })
 
             // .class
             instruct('push', { value: classClass }),
@@ -127,33 +124,15 @@ export class ClassDefinition extends ReflNode {
             instruct('send_eq', { key: 'name' }),
 
             // .shared
+            instruct('mark'),
             instruct('load', { key }),
-            // ...Assembler.if(
-            //     [instruct('responds_to', { key: 'shared' })],
-            //     // has shared already
-            //     [
-            //         instruct('send_attr', { key: 'shared'}),
-            //         instruct('store', { key: 'mu-prime'})
-            //     ],
-            //     (new ConstructObject("mu-prime")).instructions,
-            // ),
-            // instruct('push', { value: new MyrBoolean(true) }),
-            // instruct('cmp'),
-            // instruct('jump_if_zero', { target: 'create-new-shared' }),
-            // .shared=muPrime.instructions('shared')
-            // need to check if we have an attribute..
-            // instruct('mark'),
             instruct('send_attr', { key: 'shared' }),
             instruct('store', { key: 'mu-prime' }),
-            //     key: 'shared',
-            //     // onMissing: instruct('jump', { target:})
-            // }),
             ...muPrime.instructions,
-            // instruct('send', { key: 'meld' })
             instruct('load', { key }),
             instruct('load', { key: 'mu-prime' }),
             instruct('send_eq', { key: 'shared' }),
-            // instruct('sweep'),
+            instruct('sweep'),
 
             instruct('load', { key }),
         ]
