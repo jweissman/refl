@@ -16,11 +16,20 @@ export class ArrayLiteral extends ReflNode {
             instruct('arr_put'),
             loadArr,
         ]);
+        // let invokeNew = new FunctionInvocation(new Identifier("new"))
         let construct = [
+            // instruct('mark'),
+            instruct('mark_list'),
+            ...this.elements.flatMap(element => element.instructions),
+            instruct('gather'),
+            // instruct('store', { key: 'set-args'}),
+            // // isntruct('push', this.el)
             instruct('load', { key: arrayClass.name }),
             instruct('send_call', { key: 'new' }),
             instruct('store', { key }),
             ...addElems,
+            // instruct('sweep'),
+            // loadArr,
         ]
         return construct;
     }

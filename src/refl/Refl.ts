@@ -8,10 +8,12 @@ import { ReflNode } from './lang/ReflNode';
 
 export class Refl {
     bootstrap() {
-        this.interpret("using 'string'")
-        this.interpret("using 'number'")
         this.interpret("using 'boolean'")
+        this.interpret("using 'number'")
+        this.interpret("using 'string'")
         this.interpret("using 'list'")
+        this.interpret("using 'hash'")
+        // tree?
         this.interpret("using 'mirror'")
     }
 

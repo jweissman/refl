@@ -138,3 +138,112 @@ but you could implement a lot at that level
 (directly implementing AR primitives? extending them thoughtfully in the directino of your code)
 guardrails/guidelines for meta
 
+================================================================
+
+okay, just to capture the state of my thinking
+
+we have a class List (Set, etc) that declares it is `Enumerable.over(self.all)`
+(maybe this is the trait decl?)
+
+fine, so that's classes and traits roughly -- `is Enumerable` was my first take on the syntax
+
+what about database, network, filesystem access, etc? we want a few things: to inject global database references 
+and possibly permit additional syntax
+
+```
+module Record {
+    does Database.query # mixes in a db interface
+
+    all() {
+        query `select * from ${table.name}`
+    }
+}
+```
+
+this would be 'a real dream' to have the system somehow mix in grammars for you, lift language extension into the language
+
+for now it all seems like a 'nice to have' thing
+
+what's a more down to earth use of archetypes over traits?
+
+i'm thinking files and sockets -- they do 'raw input/output', reads and writes
+we'll want to wrap exceptions
+...we'll want to have some mechanism for signalling
+i was thinking a `Wire` class that wraps around a socket...
+
+```
+class Socket {
+    does Raw.input
+    does Raw.output
+
+    # work with raw input/output streams...
+    open() { ... }
+    read() { ... }
+}
+```
+
+what do we want sender/receiver code to look like?
+(it would be nice to have symmetry here)
+
+```
+using 'socket'
+sock = Socket.new(host, port)
+sock.open()
+sock.read()
+sock.close()
+```
+
+for our purposes, it might be enough to wrap around some higher-level
+things and work our way down? working all the way up the web stack seems
+kind of exciting though
+
+---
+
+roadmap ideas
+
+(a one-two kind of cadence, with bugfix/techdebt releases alternating with new fetures?)
+
+0.1 foam (core lang)
+  - variadic functions, ...
+  - classes and modules
+  - blocks as first class objects
+  - syntax sugar: @ member access
+  - case/switch
+  - traits
+  - metaclasses
+  - coroutines / continuations / yield
+  - destructuring
+  - pattern matching
+0.2 glass
+  - syntax checker / highlighting
+  - embed trace info into instructions?
+  - ...docs/optim/tech debt
+0.3 tin
+  - archetypes/hyperclasses
+  - standard library (filesystem, math, network)
+  - REFL ON THE WEB -- render a web frontend (tree lit?)
+  - db framework
+  - web framework (rest client/server)
+  - debugger
+  - package manager
+0.4 copper
+  - ...docs/optim/tech debt
+0.5 nickel
+  - distributed refl
+  - language extensions
+  - graph literals
+0.6 iron
+  - ...tech debt
+0.7 cobalt
+0.8 silver
+  - ...optim,tech debt
+0.9 steel
+1.0 titanium
+  - ...optim,tech debt
+
+------------------------------
+
+grammar puzzles ----------------
+
+`{hello:()=>'world'}['hello']()` should be a function invocation, but currently is... something else?
+  (my guess is the array index is eating it?)

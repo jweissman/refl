@@ -1,4 +1,4 @@
-import { Assembler, instruct, classClass, MyrBoolean, MyrClass, MyrString } from "myr";
+import { instruct, classClass, MyrBoolean, MyrClass, MyrString } from "myr";
 import { ReflNode, ReflProgram } from "./ReflNode";
 import { Identifier } from "./Identifier";
 import { AssignmentExpression } from "./AssignmentExpression";
@@ -34,7 +34,7 @@ class ConstructObject extends ReflNode {
 class LoadObject extends ReflNode {
     constructor(
         private name: string,
-        private ctorArgs: string[] = [],
+        private ctorArgs: ReflNode[] = [],
         private callInit: boolean = false,
     ) {
         super();
@@ -42,7 +42,7 @@ class LoadObject extends ReflNode {
 
     get instructions(): ReflProgram {
         let loadCtorArgs = 
-            this.ctorArgs.map(arg => instruct('load', { key: arg}));
+            this.ctorArgs.map(arg => instruct('load', { key: (arg as Identifier).name}));
         // console.log('load obj', { loadCtorArgs });
         return [
             instruct('sweep'), // cleanup (if there was anything left over from construct) 
@@ -50,7 +50,9 @@ class LoadObject extends ReflNode {
                 instruct('mark'), // insert tombstone
                 ...loadCtorArgs,
                 instruct('load', { key: this.name }),
+                // instruct('dump', { key: 'pre-initialize'}),
                 instruct('send_call', { key: 'initialize' }),
+                // instruct('dump', { key: 'post-initialize'}),
                 instruct('sweep'), // pop until tombstone
             ] : []),
             instruct('load', { key: this.name }),
@@ -76,7 +78,7 @@ class SelfAssignment extends AssignmentExpression {
 export class ClassDefinition extends ReflNode {
 
     hasInitializer: boolean = false
-    ctorArgs: string[] = []
+    ctorArgs: ReflNode[] = []
     constructor(public id: Identifier, public body: Program) {
         super();
     }
@@ -157,7 +159,7 @@ export class ClassDefinition extends ReflNode {
                     if (line.right instanceof FunctionLiteral) {
                         line.right.label = `${this.id.name}.${line.left.name}`;
                         if (line.left.name === 'initialize') {
-                            this.ctorArgs = line.right.args;
+                            this.ctorArgs = line.right.args; //.map(arg => (arg as Identifier).name);
                             this.hasInitializer = true;
                         }
                     }

@@ -12,6 +12,7 @@ export class DotAccess extends ReflNode {
             program = [
                 ...this.object.instructions,
                 instruct('send_attr', { key: this.message.name }),
+                // instruct('send_attr', { key: this.message.name }),
             ];
         } else if (this.message instanceof FunctionInvocation) {
             program = [
@@ -23,8 +24,8 @@ export class DotAccess extends ReflNode {
                 instruct('send_call', { key: (this.message.fn as Identifier).name }),
             ]
         } else {
-            console.trace("message wasn't an identifier or fn invocation?", { msg: this.message })
-            program = []
+            console.trace("message wasn't an identifier", { msg: this.message })
+        //     program = []
         }
         return program;
     }

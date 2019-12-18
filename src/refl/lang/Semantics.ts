@@ -21,6 +21,7 @@ import { ArrayLookup } from './ArrayLookup';
 import { HashLiteral } from './HashLiteral';
 import { KeyValuePair } from './KeyValuePair';
 import { BooleanLiteral } from './BooleanLiteral';
+import { ArrayInsert } from './ArrayInsert';
 
 const semantics: Semantics = Grammar.createSemantics();
 
@@ -34,11 +35,15 @@ const tree = {
         );
     },
 
-    DotAccess_method: (obj: Node, _dot: Node, message: Node) => {
+    // DotAccess_method: (obj: Node, _dot: Node, message: Node) => {
+    //     return new DotAccess(obj.tree, message.tree);
+    // },
+
+    DotAccess_property: (obj: Node, _dot: Node, message: Node) => {
         return new DotAccess(obj.tree, message.tree);
     },
 
-    DotAccess_property: (obj: Node, _dot: Node, message: Node) => {
+    DotAccess_method: (obj: Node, _dot: Node, message: Node) => {
         return new DotAccess(obj.tree, message.tree);
     },
 
@@ -49,7 +54,7 @@ const tree = {
     Params: (_lp: Node, paramList: Node, _rp: Node) => paramList.tree,
 
     FunArgs: (_lp: Node, argList: Node, _rp: Node): string[] => {
-        return argList.tree.map((id: Identifier) => id.name);
+        return argList.tree; //.map((id: Identifier) => id.name);
     },
     // FunArg: (_lp: Node, argList: Node, _rp: Node): string[] => {
     //     return 
@@ -184,7 +189,14 @@ const tree = {
         return new ArrayLiteral(elements.tree);
     },
 
-    ArrayIndex: (id: Node, _lb: Node, index: Node, _rb: Node) => {
+    PriExpr_array_write: (arrayIndex: Node, _eq: Node, e: Node) => {
+        return new ArrayInsert(arrayIndex.tree, e.tree)
+    },
+
+    // ArrayIndex_write: (id: Node, _lb: Node, index: Node, _rb: Node) => {
+    //     return new ArrayLookup(id.tree, index.tree, true);
+    // },
+    ArrayIndex_read: (id: Node, _lb: Node, index: Node, _rb: Node) => {
         return new ArrayLookup(id.tree, index.tree);
     },
 

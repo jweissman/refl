@@ -1,7 +1,12 @@
 class String {
     initialize(contents) {
         self._set(contents);
+        # println("NEW STRING")
     }
+
+    # to_a() { List.new(self._getChars()) }
+
+    # [](i) {}
 
     all() { self.to_a() }
     length() { self.all().length() }

@@ -42,7 +42,7 @@ Refl {
       = "(" ListOf<ident, ","> ")"
     
     Assignment
-      = (ArrayIndex | DotAccess | ident) "=" Expr
+      = Expr "=" Expr
 
     CmpExpr
       = LogExpr ">" LogExpr -- gt
@@ -76,15 +76,17 @@ Refl {
     PriExpr
       = 
       | "(" Expr ")" -- parens
-      | "-" PriExpr -- neg 
-      | ArrayIndex
+      | "-" PriExpr -- neg
+      | ArrayIndex "=" Expr -- array_write
       | DotAccess
+	    | Funcall
+      | ArrayIndex
+      | Funcall
       | Lambda
       | ArrayLit
       | StringLit
       | HashLit
       | BooleanLit
-      | Funcall
       | ident
       | number
     
@@ -102,10 +104,12 @@ Refl {
       = "[" ListOf<Expr, ","> "]"
     
     ArrayIndex
-      = Receiver "[" Expr "]"
-    
+      = 
+      //| Receiver "[" Expr "]"  "=" -- write
+      | Receiver "[" Expr "]" -- read
+      
     Funcall
-      = (Funcall | ident) Params
+      = Receiver Params
 
     Params = "(" ListOf<Expr, ","> ")" 
 
@@ -115,7 +119,6 @@ Refl {
     
     Receiver
       = PriExpr
-
     StringLit
       = "'" #singleStringCharacter* "'"
       | "\"" #doubleStringCharacter* "\""

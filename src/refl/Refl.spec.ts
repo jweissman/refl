@@ -17,6 +17,16 @@ describe(Refl, () => {
         // expect(interpreter.machine.stack.length).toEqual(0)
     })
 
+    it("string len", () => {
+        expect(refl.interpret("'hello'.length()")).toEqual(5)
+    })
+
+    fit('array push', () => {
+        expect(refl.interpret("[1,2,3][1]")).toEqual(2)
+        expect(refl.interpret("[1,2,3][0]")).toEqual(1)
+        expect(refl.interpret("[1,2,3].push(4)")).toEqual([1,2,3,4])
+    })
+
     describe("comments", () => {
         it('ignores anything after an octothorpe (#)', () => {
             expect(refl.interpret("1+2 # +3-4")).toEqual(3)
@@ -496,9 +506,11 @@ describe(Refl, () => {
         it('mirrors', () => {
             refl.interpret(`
             mirror = Mirror.new();
-            list = mirror.conjure('List').new()
+            list = mirror.conjure('List').new([1,2,3])
             `)
             expect(refl.interpret("list.class")).toEqual("List")
+            expect(refl.interpret("list[0]")).toEqual(1)
+            expect(refl.interpret("list[1]")).toEqual(2)
         })
     })
 
@@ -616,30 +628,36 @@ describe(Refl, () => {
             expect(refl.interpret("Boolean.new(true).false()")).toEqual(false)
             expect(refl.interpret("Boolean.new(false).false()")).toEqual(true)
         })
-        xit('hashes', () => {
+        it('hashes', () => {
             expect(refl.interpret("h=Hash.new({a:1});h")).toEqual({a:1})
-            expect(refl.interpret("Hash.new({a:1,b:2}).keys")).toEqual(['a','b'])
+            // expect(refl.interpret("Hash.new({a:1,b:2}).keys()")).toEqual(['a','b'])
         })
-        xit('lists', () => {
+        it('lists', () => {
             expect(refl.interpret("l=List.new([1,2,3]);l")).toEqual([1, 2, 3])
             expect(refl.interpret("l.length")).toEqual(3)
+        })
+        xit('classes', () => {
+            expect(refl.interpret("klass=Class.new('Foo'); klass")).toEqual('Foo')
+            expect(refl.interpret("klass.new().class")).toEqual("foo")
         })
     })
 
     test.todo("ranges")
 
-    // test.todo("objects can call into own js methods")
     test.todo("arrays and hashes are enumerable")
-    test.todo("tuple type?")
-    // test.todo("arrays and hashes are 'kernel' objects (can call into own js methods somehow?)")
 
     test.todo("blocks as objects")
     test.todo("yield to block")
+    test.todo("generators")
 
+    test.todo("introspect method names")
     test.todo("as_instance_method (instance_exec)")
     test.todo("array methods (push/pop, len)")
 
     xit("tree literal (xhtml structure)", () => {
+        // what if tree lit AS the ast type? obvs we 'could' represent expressions like this...
+        // <If><Test><Compare op=">="></Compare></Test><Passed><Print args=["okay"] />]/></Passed></If>
+        // (meta-circ at THIS level COULD be interesting...)
         refl.interpret('tree=<root><leaf/></root>')
         expect(refl.interpret('tree.root')).toEqual('<leaf/>')
     })
@@ -647,10 +665,16 @@ describe(Refl, () => {
     test.todo("@ member access (self sugar)")
     test.todo("default parameter values")
 
+    test.todo("set")
+    test.todo("matrix")
+    test.todo("math")
+
     test.todo("superclasses")
     test.todo("eigenclasses")
+    test.todo("hyperclasses")
     test.todo("modules")
     test.todo("traits")
+    test.todo("archetypes")
 
     test.todo("mirrors")
     // mirror object: tells you what the structure of function is

@@ -1,11 +1,11 @@
 class List {
-    initialize() {
-        # print("NEW LIST")
+    initialize(elements) {
+        # println("NEW LIST")
+        self._set(elements)
     }
 
     first() { self[0] }
-    last() { self[self.length()-1] }
-
+    last()  { self[self.length()-1] }
     push(e) { self[self.length()]=e }
 
     each(fn) { 
@@ -16,6 +16,15 @@ class List {
             i=i+1;
         }
     }
-
     # reverse..
+
+    includes(e) {
+        i=0;
+        max=self.length()
+        while (i<max) {
+            if (e == self[i]) { return(true) }
+            i=i+1;
+        }
+        false
+    }
 }
