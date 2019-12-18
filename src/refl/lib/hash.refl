@@ -1,12 +1,14 @@
 class Hash {
     initialize(contents) { self._set(contents); }
     get(k) { self._get(k) }
-    # set(k,v) { self._set(k,v) }
+    set(k,v) { self._put(k,v) }
     keys() { List.new(self._keys()) }
 
     [](k) { self.get(k) }
     # []=(k,v) { self.set(k,v) }
     has_key(k) { self.keys().includes(k) }
+
+    entries() { self.keys().map( (k) => [k,self.get(k)]) }
 
     method_missing(meth) {
         if (self.has_key(meth)) {

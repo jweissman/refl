@@ -4,11 +4,14 @@ class String {
         # println("NEW STRING")
     }
 
-    # to_a() { List.new(self._getChars()) }
+    +(other) {
+        String.new(self._join(other))
+    }
 
-    # [](i) {}
-
+    to_s() { self }
+    to_a() { List.new(self._to_a()) }
     all() { self.to_a() }
+
     length() { self.all().length() }
 
     reverse() {
@@ -20,21 +23,4 @@ class String {
         }
         res
     }
-
-    # [](i) { self.to_a()[i] }
-
-    words() {
-        self.to_a().split(" ")
-    }
-
-    #split(delim) {
-    #    fragments = []
-    #    i=0; max=self.length();
-    #    fragment = ''
-    #    fragmentStart = 0
-    #    while(i<max) {
-    #        res=res+self[max-i-1]
-    #        i=i+1;
-    #    }
-    #}
 }

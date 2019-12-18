@@ -17,319 +17,338 @@ describe(Refl, () => {
         // expect(interpreter.machine.stack.length).toEqual(0)
     })
 
-    it("string len", () => {
-        expect(refl.interpret("'hello'.length()")).toEqual(5)
-    })
-
-    fit('array push', () => {
-        expect(refl.interpret("[1,2,3][1]")).toEqual(2)
-        expect(refl.interpret("[1,2,3][0]")).toEqual(1)
-        expect(refl.interpret("[1,2,3].push(4)")).toEqual([1,2,3,4])
-    })
-
-    describe("comments", () => {
-        it('ignores anything after an octothorpe (#)', () => {
-            expect(refl.interpret("1+2 # +3-4")).toEqual(3)
-            expect(refl.interpret("1+ # +3-4\n5")).toEqual(6)
-        })
-    })
-
-    describe('arithmetic', () => {
-        it('adds two numbers', () => {
-            expect(refl.interpret('5+6')).toEqual(11)
+    describe('smoke', () => {
+        it("string len", () => {
+            expect(refl.interpret("'hello'.length()")).toEqual(5)
         })
 
-        it('adds three numbers', () => {
-            expect(refl.interpret('5+6+7')).toEqual(18)
-            expect(refl.interpret('3+6+9')).toEqual(18)
+        it('array push', () => {
+            expect(refl.interpret("[1,2,3][1]")).toEqual(2)
+            expect(refl.interpret("[1,2,3][0]")).toEqual(1)
+            expect(refl.interpret("[1,2,3].push(4)")).toEqual([1, 2, 3, 4])
         })
 
-        it('subtracts one number from another', () => {
-            expect(refl.interpret('5-6')).toEqual(-1);
-            expect(refl.interpret('9-6')).toEqual(3);
+        describe("comments", () => {
+            it('ignores anything after an octothorpe (#)', () => {
+                expect(refl.interpret("1+2 # +3-4")).toEqual(3)
+                expect(refl.interpret("1+ # +3-4\n5")).toEqual(6)
+            })
         })
 
-        it('multiplies two numbers', () => {
-            expect(refl.interpret('5*5')).toEqual(25);
-        })
-
-        it('divides two numbers', () => {
-            expect(refl.interpret('100/4')).toEqual(25);
-        })
-
-        it('exponentiates', () => {
-            expect(refl.interpret('2^8')).toEqual(256)
-            expect(refl.interpret('10^3')).toEqual(1000)
-        })
-
-        it('orders operations', () => {
-            expect(refl.interpret('10+20/2')).toEqual(20);
-            expect(refl.interpret('1-100/4+1')).toEqual(-23);
-        })
-
-        it("negative numbers", () => {
-            expect(refl.interpret("-3")).toEqual(-3)
-            expect(refl.interpret("10+-1")).toEqual(9)
-        })
-
-        it("parentheses help ordering", () => {
-            expect(refl.interpret("3*(2+1)")).toEqual(9)
-            expect(refl.interpret("(2-1)*5")).toEqual(5)
-        })
-    })
-
-    describe('variables', () => {
-        it('defines', () => {
-            refl.interpret('a = 5') //#).toEqual('a')
-            expect(refl.interpret('a * 10')).toEqual(50)
-            refl.interpret('b = 12') //).toEqual('b')
-            expect(refl.interpret('a * b')).toEqual(60)
-            expect(refl.interpret('b / 2')).toEqual(6)
-            expect(refl.interpret('b ^ 2')).toEqual(144)
-        })
-    })
-
-    describe('funcalls', () => {
-        it('defines and invokes single-arg fns', () => {
-            refl.interpret('double = (x) => x * 2') //).toEqual('double')
-            expect(refl.interpret("double(2)")).toEqual(4)
-            expect(refl.interpret("double(7)")).toEqual(14)
-            expect(refl.interpret("double(128)")).toEqual(256)
-        });
-
-        it('defines and invokes multi-arg fns', () => {
-            refl.interpret('pow = (x, y) => x ^ y') //).toEqual('pow')
-            expect(refl.interpret("pow(2,2)")).toEqual(4)
-        });
-
-        it("evaluates positional arguments", () => {
-            refl.interpret('double = (x) => x * 2') //).toEqual('double')
-            refl.interpret("a=10") //).toEqual('a')
-            expect(refl.interpret("double(a)")).toEqual(20)
-        })
-
-        it("multi-line functions", () => {
-            refl.interpret("pow = (x,y) { x+y; return(x ^ y); }");
-            expect(refl.interpret("pow(2,3)")).toEqual(8)
-            expect(refl.interpret("pow(2,8)")).toEqual(256)
-        })
-
-        it('higher order functions', () => {
-            // okay, this needs to create a closure...?
-            refl.interpret("twice=(f)=>(x)=>f(f(x))")
-            refl.interpret("double=(x)=>x*2")
-            refl.interpret("quadruple=twice(double)")
-            expect(refl.interpret("quadruple(5)")).toEqual(20)
-            expect(refl.interpret("quadruple(24)")).toEqual(96)
-            expect(refl.interpret("twice((x)=>x*2)(2)")).toEqual(8)
-        })
-
-        it('closes around known values at definition time', () => {
-            refl.interpret("x=123") //).toEqual('x')
-            refl.interpret('c=()=>x') //).toEqual('c')
-            expect(refl.interpret('c()')).toEqual(123)
-            refl.interpret("x=234") //).toEqual('x')
-            expect(refl.interpret('c()')).toEqual(123)
-            expect(refl.interpret('x')).toEqual(234)
-        })
-
-        it('calls builtins', () => {
-            Refl.tracedOutput = []
-            refl.interpret('print(123)');
-            expect(Refl.tracedOutput).toEqual([123]);
-
-            Refl.tracedOutput = []
-            refl.interpret('print(1,2,3)');
-            expect(Refl.tracedOutput).toEqual([1,2,3]);
-        })
-    })
-
-    describe("control flow structures", () => {
-        it('strict comparators', () => {
-            expect(refl.interpret('1 > 0')).toEqual(true);
-            expect(refl.interpret('0 > 1')).toEqual(false);
-
-            expect(refl.interpret('1 < 0')).toEqual(false);
-            expect(refl.interpret('0 < 1')).toEqual(true);
-
-            expect(refl.interpret('1 == 0')).toEqual(false);
-            expect(refl.interpret('1 == 1')).toEqual(true);
-
-            expect(refl.interpret('1 != 0')).toEqual(true);
-            expect(refl.interpret('1 != 1')).toEqual(false);
-        });
-
-        xit('loose comparators', () => {
-            expect(refl.interpret('2 >= 1')).toEqual(true);
-            expect(refl.interpret('2 >= 2')).toEqual(true);
-            expect(refl.interpret('2 >= 3')).toEqual(false);
-
-            expect(refl.interpret('2 <= 1')).toEqual(false);
-            expect(refl.interpret('2 <= 2')).toEqual(true);
-            expect(refl.interpret('2 <= 3')).toEqual(true);
-        });
-
-        it('ternaries', () => {
-            refl.interpret('burj=2717') 
-            refl.interpret('wt=1776')
-            expect(refl.interpret('burj>wt ? 1 : 0')).toEqual(1)
-        })
-
-        describe('conditionals with if/else', () => {
-            it('given test is positive, activates the left branch', () => {
-                refl.interpret('if (1>0) { print(1); } else { print(-1); }')
-                expect(Refl.tracedOutput).toEqual([1]);
-            });
-
-            it('given test is negative, activates the right branch', () => {
-                refl.interpret('if (1<0) { print(1); } else { print(-1); }')
-                expect(Refl.tracedOutput).toEqual([-1]);
-            });
-        });
-
-        describe('conditions with only if', () => {
-            it('given test is positive, activates the branch', () => {
-                refl.interpret('if (1>0) { print(1); }')
-                expect(Refl.tracedOutput).toEqual([1]);
-            });
-
-            it('given test is negative, activates the right branch', () => {
-                refl.interpret('if (0>1) { print(1); }')
-                expect(Refl.tracedOutput).toEqual([]);
-            });
-
-            it('given test is true executes', () => {
-                refl.interpret('if (true) { print(1); }')
-                expect(Refl.tracedOutput).toEqual([1]);
-            });
-        })
-
-        describe("boolean algebra", () => {
-            it('true/false', () => {
-                expect(refl.interpret("true")).toEqual(true)
-                expect(refl.interpret("false")).toEqual(false)
+        describe('arithmetic', () => {
+            it('adds two numbers', () => {
+                expect(refl.interpret('5+6')).toEqual(11)
             })
 
-            it('and', () => {
-                expect(refl.interpret("true && true")).toEqual(true)
-                expect(refl.interpret("true && false")).toEqual(false)
-                expect(refl.interpret("false && true")).toEqual(false)
-                expect(refl.interpret("false && false")).toEqual(false)
-            });
-
-            // or - ||
-            it('or', () => {
-                expect(refl.interpret("true || true")).toEqual(true)
-                expect(refl.interpret("true || false")).toEqual(true)
-                expect(refl.interpret("false || true")).toEqual(true)
-                expect(refl.interpret("false || false")).toEqual(false)
-            });
-
-            // not - !
-            it('not', () => {
-                expect(refl.interpret("!true")).toEqual(false)
-                expect(refl.interpret("!false")).toEqual(true)
-                expect(refl.interpret("!!true")).toEqual(true)
-                expect(refl.interpret("!!false")).toEqual(false)
-            });
-        })
-
-        it('recursion', () => {
-            refl.interpret("fib=(n)=>n<3?1:fib(n-1)+fib(n-2)")
-            expect(refl.interpret("fib(1)")).toEqual(1)
-            expect(refl.interpret("fib(2)")).toEqual(1)
-            expect(refl.interpret("fib(3)")).toEqual(2)
-            expect(refl.interpret("fib(4)")).toEqual(3)
-            expect(refl.interpret("fib(5)")).toEqual(5)
-            expect(refl.interpret("fib(6)")).toEqual(8)
-            expect(refl.interpret("fib(7)")).toEqual(13)
-            expect(refl.interpret("fib(8)")).toEqual(21)
-
-            refl.interpret("fact=(n)=>n<2?1:n*fact(n-1)")
-            expect(refl.interpret("fact(5)")).toEqual(120)
-            expect(refl.interpret("fact(7)")).toEqual(5040)
-        })
-
-        describe('iteration', () => {
-            it('with while', () => {
-                refl.interpret("i=1; while (i<4) { print(i); i=i+1 }")
-                expect(Refl.tracedOutput).toEqual([1, 2, 3])
+            it('adds three numbers', () => {
+                expect(refl.interpret('5+6+7')).toEqual(18)
+                expect(refl.interpret('3+6+9')).toEqual(18)
             })
 
-            test.todo('with for')
-        });
+            it('subtracts one number from another', () => {
+                expect(refl.interpret('5-6')).toEqual(-1);
+                expect(refl.interpret('9-6')).toEqual(3);
+            })
+
+            it('multiplies two numbers', () => {
+                expect(refl.interpret('5*5')).toEqual(25);
+            })
+
+            it('divides two numbers', () => {
+                expect(refl.interpret('100/4')).toEqual(25);
+            })
+
+            it('exponentiates', () => {
+                expect(refl.interpret('2^8')).toEqual(256)
+                expect(refl.interpret('10^3')).toEqual(1000)
+            })
+
+            it('orders operations', () => {
+                expect(refl.interpret('10+20/2')).toEqual(20);
+                expect(refl.interpret('1-100/4+1')).toEqual(-23);
+            })
+
+            it("negative numbers", () => {
+                expect(refl.interpret("-3")).toEqual(-3)
+                expect(refl.interpret("10+-1")).toEqual(9)
+            })
+
+            it("parentheses help ordering", () => {
+                expect(refl.interpret("3*(2+1)")).toEqual(9)
+                expect(refl.interpret("(2-1)*5")).toEqual(5)
+            })
+        })
+
+        describe('variables', () => {
+            it('defines', () => {
+                refl.interpret('a = 5') //#).toEqual('a')
+                expect(refl.interpret('a * 10')).toEqual(50)
+                refl.interpret('b = 12') //).toEqual('b')
+                expect(refl.interpret('a * b')).toEqual(60)
+                expect(refl.interpret('b / 2')).toEqual(6)
+                expect(refl.interpret('b ^ 2')).toEqual(144)
+            })
+        })
+
+        describe('funcalls', () => {
+            it('defines and invokes single-arg fns', () => {
+                refl.interpret('double = (x) => x * 2') //).toEqual('double')
+                expect(refl.interpret("double(2)")).toEqual(4)
+                expect(refl.interpret("double(7)")).toEqual(14)
+                expect(refl.interpret("double(128)")).toEqual(256)
+            });
+
+            it('defines and invokes multi-arg fns', () => {
+                refl.interpret('pow = (x, y) => x ^ y') //).toEqual('pow')
+                expect(refl.interpret("pow(2,2)")).toEqual(4)
+            });
+
+            it("evaluates positional arguments", () => {
+                refl.interpret('double = (x) => x * 2') //).toEqual('double')
+                refl.interpret("a=10") //).toEqual('a')
+                expect(refl.interpret("double(a)")).toEqual(20)
+            })
+
+            it("multi-line functions", () => {
+                refl.interpret("pow = (x,y) { x+y; return(x ^ y); }");
+                expect(refl.interpret("pow(2,3)")).toEqual(8)
+                expect(refl.interpret("pow(2,8)")).toEqual(256)
+            })
+
+            it('higher order functions', () => {
+                // okay, this needs to create a closure...?
+                refl.interpret("twice=(f)=>(x)=>f(f(x))")
+                refl.interpret("double=(x)=>x*2")
+                refl.interpret("quadruple=twice(double)")
+                expect(refl.interpret("quadruple(5)")).toEqual(20)
+                expect(refl.interpret("quadruple(24)")).toEqual(96)
+                expect(refl.interpret("twice((x)=>x*2)(2)")).toEqual(8)
+            })
+
+            it('closes around known values at definition time', () => {
+                refl.interpret("x=123") //).toEqual('x')
+                refl.interpret('c=()=>x') //).toEqual('c')
+                expect(refl.interpret('c()')).toEqual(123)
+                refl.interpret("x=234") //).toEqual('x')
+                expect(refl.interpret('c()')).toEqual(123)
+                expect(refl.interpret('x')).toEqual(234)
+            })
+
+            it('calls builtins', () => {
+                Refl.tracedOutput = []
+                refl.interpret('print(123)');
+                expect(Refl.tracedOutput).toEqual([123]);
+
+                Refl.tracedOutput = []
+                refl.interpret('print(1,2,3)');
+                expect(Refl.tracedOutput).toEqual([1, 2, 3]);
+            })
+        })
+
+        describe("control flow structures", () => {
+            it('strict comparators', () => {
+                expect(refl.interpret('1 > 0')).toEqual(true);
+                expect(refl.interpret('0 > 1')).toEqual(false);
+
+                expect(refl.interpret('1 < 0')).toEqual(false);
+                expect(refl.interpret('0 < 1')).toEqual(true);
+
+                expect(refl.interpret('1 == 0')).toEqual(false);
+                expect(refl.interpret('1 == 1')).toEqual(true);
+
+                expect(refl.interpret('1 != 0')).toEqual(true);
+                expect(refl.interpret('1 != 1')).toEqual(false);
+            });
+
+            xit('loose comparators', () => {
+                expect(refl.interpret('2 >= 1')).toEqual(true);
+                expect(refl.interpret('2 >= 2')).toEqual(true);
+                expect(refl.interpret('2 >= 3')).toEqual(false);
+
+                expect(refl.interpret('2 <= 1')).toEqual(false);
+                expect(refl.interpret('2 <= 2')).toEqual(true);
+                expect(refl.interpret('2 <= 3')).toEqual(true);
+            });
+
+            it('ternaries', () => {
+                refl.interpret('burj=2717')
+                refl.interpret('wt=1776')
+                expect(refl.interpret('burj>wt ? 1 : 0')).toEqual(1)
+            })
+
+            describe('conditionals with if/else', () => {
+                it('given test is positive, activates the left branch', () => {
+                    refl.interpret('if (1>0) { print(1); } else { print(-1); }')
+                    expect(Refl.tracedOutput).toEqual([1]);
+                });
+
+                it('given test is negative, activates the right branch', () => {
+                    refl.interpret('if (1<0) { print(1); } else { print(-1); }')
+                    expect(Refl.tracedOutput).toEqual([-1]);
+                });
+            });
+
+            describe('conditions with only if', () => {
+                it('given test is positive, activates the branch', () => {
+                    refl.interpret('if (1>0) { print(1); }')
+                    expect(Refl.tracedOutput).toEqual([1]);
+                });
+
+                it('given test is negative, activates the right branch', () => {
+                    refl.interpret('if (0>1) { print(1); }')
+                    expect(Refl.tracedOutput).toEqual([]);
+                });
+
+                it('given test is true executes', () => {
+                    refl.interpret('if (true) { print(1); }')
+                    expect(Refl.tracedOutput).toEqual([1]);
+                });
+            })
+
+            describe("boolean algebra", () => {
+                it('true/false', () => {
+                    expect(refl.interpret("true")).toEqual(true)
+                    expect(refl.interpret("false")).toEqual(false)
+                })
+
+                it('and', () => {
+                    expect(refl.interpret("true && true")).toEqual(true)
+                    expect(refl.interpret("true && false")).toEqual(false)
+                    expect(refl.interpret("false && true")).toEqual(false)
+                    expect(refl.interpret("false && false")).toEqual(false)
+                });
+
+                // or - ||
+                it('or', () => {
+                    expect(refl.interpret("true || true")).toEqual(true)
+                    expect(refl.interpret("true || false")).toEqual(true)
+                    expect(refl.interpret("false || true")).toEqual(true)
+                    expect(refl.interpret("false || false")).toEqual(false)
+                });
+
+                // not - !
+                it('not', () => {
+                    expect(refl.interpret("!true")).toEqual(false)
+                    expect(refl.interpret("!false")).toEqual(true)
+                    expect(refl.interpret("!!true")).toEqual(true)
+                    expect(refl.interpret("!!false")).toEqual(false)
+                });
+            })
+
+            it('recursion', () => {
+                refl.interpret("fib=(n)=>n<3?1:fib(n-1)+fib(n-2)")
+                expect(refl.interpret("fib(1)")).toEqual(1)
+                expect(refl.interpret("fib(2)")).toEqual(1)
+                expect(refl.interpret("fib(3)")).toEqual(2)
+                expect(refl.interpret("fib(4)")).toEqual(3)
+                expect(refl.interpret("fib(5)")).toEqual(5)
+                expect(refl.interpret("fib(6)")).toEqual(8)
+                expect(refl.interpret("fib(7)")).toEqual(13)
+                expect(refl.interpret("fib(8)")).toEqual(21)
+
+                refl.interpret("fact=(n)=>n<2?1:n*fact(n-1)")
+                expect(refl.interpret("fact(5)")).toEqual(120)
+                expect(refl.interpret("fact(7)")).toEqual(5040)
+            })
+
+            describe('iteration', () => {
+                it('with while', () => {
+                    refl.interpret("i=1; while (i<4) { print(i); i=i+1 }")
+                    expect(Refl.tracedOutput).toEqual([1, 2, 3])
+                })
+
+                test.todo('with for')
+            });
+        })
+
+        describe("scope", () => {
+            // this is pretty important for general programming :D
+            it('can mutate global vars from inside a function', () => {
+                refl.interpret(`
+              arr=[1,2,3,4,5]
+              set=(x,i)=>arr[i]=x
+              set(10,0)
+              set(20,1)
+              set(30,2)
+            `)
+                expect(refl.interpret('arr')).toEqual([10, 20, 30, 4, 5])
+            })
+       })
     })
 
-    describe("string lit", () => {
-        it("single quote", () => {
-            refl.interpret("subj='world'")
-            refl.interpret("print('hello ' + subj)")
-            expect(Refl.tracedOutput).toEqual(['hello world']);
+    fdescribe('structures', () => {
+
+        describe("string lit", () => {
+            it("single quote", () => {
+                refl.interpret("subj='world'")
+                refl.interpret("print('hello ' + subj)")
+                expect(Refl.tracedOutput).toEqual(['hello world']);
+            });
+
+            it("double quote", () => {
+                refl.interpret("subj=\"user\"")
+                refl.interpret("print('hello ' + subj)")
+                expect(Refl.tracedOutput).toEqual(['hello user']);
+            });
+        })
+
+        it("formal fns", () => {
+            refl.interpret("three() { 3 }")
+            expect(refl.interpret("three()")).toEqual(3)
+        })
+
+        it("array lit", () => {
+            refl.interpret('a=[10,20,30]');
+            expect(refl.interpret('a')).toEqual([10, 20, 30])
+            expect(refl.interpret('a[0]')).toEqual(10)
+            expect(refl.interpret('a[1]')).toEqual(20)
+            expect(refl.interpret('a[2]')).toEqual(30)
+            expect(refl.interpret('a[3]')).toEqual("nil") //toThrow("array index out of bounds")
+            refl.interpret('a[2]=-1');
+            expect(refl.interpret('a')).toEqual([10, 20, -1])
         });
 
-        it("double quote", () => {
-            refl.interpret("subj=\"user\"")
-            refl.interpret("print('hello ' + subj)")
-            expect(Refl.tracedOutput).toEqual(['hello user']);
+        it('array manip', () => {
+            refl.interpret('g=()=>[10,20,30]');
+            expect(refl.interpret('g()[2]')).toEqual(30)
+            refl.interpret('print(g()[2])')
+            expect(Refl.tracedOutput).toEqual([30])
+        })
+
+        it('returning array index does not trash the stack', () => {
+            refl.interpret('arr=[1,2,3,4]')
+            refl.interpret('set=(i)=>{arr[i]=5;arr[i]}')
+            expect(refl.interpret("set(4)")).toEqual(5)
+            expect(refl.interpret("arr")).toEqual([1, 2, 3, 4, 5])
+            expect(interpreter.machine.stack.length).toEqual(0)
+        })
+
+        it("associative arrays", () => {
+            refl.interpret("user={name:'John', age:21, scores: [88, 94, 87, 78, 85, 92]}")
+            expect(refl.interpret("user.name")).toEqual("John")
+            expect(refl.interpret("user.age")).toEqual(21)
+            expect(refl.interpret("user.scores")).toEqual([88, 94, 87, 78, 85, 92])
+        })
+
+        it('hash manip', () => {
+            refl.interpret("match={one: 'Bob', two: 'Fiona'}")
+            refl.interpret("match.one = 'Tom'")
+            expect(refl.interpret("match.one")).toEqual("Tom")
+            expect(refl.interpret("match")).toEqual({ one: "Tom", two: "Fiona" })
+        })
+
+        it('hashes accept fns', () => {
+            refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
+            expect(refl.interpret("math.double(8)")).toEqual(16)
+            expect(refl.interpret("math.exp(2,8)")).toEqual(256)
         });
-    })
 
-    it("formal fns", () => {
-        refl.interpret("three() { 3 }")
-        expect(refl.interpret("three()")).toEqual(3)
-    })
-
-    it("array lit", () => {
-        refl.interpret('a=[10,20,30]');
-        expect(refl.interpret('a')).toEqual([10,20,30])
-        expect(refl.interpret('a[0]')).toEqual(10)
-        expect(refl.interpret('a[1]')).toEqual(20)
-        expect(refl.interpret('a[2]')).toEqual(30)
-        expect(refl.interpret('a[3]')).toEqual("nil") //toThrow("array index out of bounds")
-        refl.interpret('a[2]=-1'); 
-        expect(refl.interpret('a')).toEqual([10,20,-1])
+        it('treat hash function members treat as values', () => {
+            refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
+            expect(refl.interpret("math.double")).toMatch("MyrFunction")
+            expect(refl.interpret("math.exp")).toMatch("MyrFunction")
+        })
     });
-
-    it('array manip', () => {
-        refl.interpret('g=()=>[10,20,30]');
-        expect(refl.interpret('g()[2]')).toEqual(30)
-        refl.interpret('print(g()[2])')
-        expect(Refl.tracedOutput).toEqual([30])
-    })
-
-    it('returning array index does not trash the stack', () => {
-        refl.interpret('arr=[1,2,3,4]')
-        refl.interpret('set=(i)=>{arr[i]=5;arr[i]}')
-        expect(refl.interpret("set(4)")).toEqual(5)
-        expect(refl.interpret("arr")).toEqual([1,2,3,4,5])
-        expect(interpreter.machine.stack.length).toEqual(0)
-    })
-
-    it("associative arrays", () => {
-        refl.interpret("user={name:'John', age:21, scores: [88, 94, 87, 78, 85, 92]}")
-        expect(refl.interpret("user.name")).toEqual("John")
-        expect(refl.interpret("user.age")).toEqual(21)
-        expect(refl.interpret("user.scores")).toEqual([88, 94, 87, 78, 85, 92])
-    })
-
-    it('hash manip', () => {
-        refl.interpret("match={one: 'Bob', two: 'Fiona'}")
-        refl.interpret("match.one = 'Tom'")
-        expect(refl.interpret("match.one")).toEqual("Tom")
-        expect(refl.interpret("match")).toEqual({ one: "Tom", two: "Fiona"})
-    })
-
-    it('hashes accept fns', () => {
-        refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
-        expect(refl.interpret("math.double(8)")).toEqual(16)
-        expect(refl.interpret("math.exp(2,8)")).toEqual(256)
-    });
-
-    it('treat hash function members treat as values', () => {
-        refl.interpret("math={double:(x)=>x*2,exp:(x,y)=>x^y}")
-        expect(refl.interpret("math.double")).toMatch("MyrFunction")
-        expect(refl.interpret("math.exp")).toMatch("MyrFunction")
-    })
 
     describe("classes", () => {
         it('construct keeps a clear stack', () => {
@@ -472,19 +491,6 @@ describe(Refl, () => {
         // test.todo("refinement") // has eigenclass
     })
 
-    describe("scope", () => {
-        // this is pretty important for general programming :D
-        it('can mutate global vars from inside a function', () => {
-            refl.interpret(`
-              arr=[1,2,3,4,5]
-              set=(x,i)=>arr[i]=x
-              set(10,0)
-              set(20,1)
-              set(30,2)
-            `)
-            expect(refl.interpret('arr')).toEqual([10,20,30,4,5])
-        })
-    })
 
     xit("exec", () => {
         expect(refl.interpret("len([1,2])")).toEqual(2)
@@ -541,26 +547,24 @@ describe(Refl, () => {
         })
         it('&&', () => {
             expect(refl.interpret("a()&&b()&&c()")).toEqual(false)
-            expect(Refl.tracedOutput).toEqual(['a','b'])
+            expect(Refl.tracedOutput).toEqual(['a', 'b'])
         })
         it('||', () => {
             expect(refl.interpret("c()||b()||a()")).toEqual(true)
-            expect(Refl.tracedOutput).toEqual(['c','b','a'])
+            expect(Refl.tracedOutput).toEqual(['c', 'b', 'a'])
         })
     })
 
 
     xit('checks fn arity before invocation', () => {
         refl.interpret('double=(x)=>2*x')
-        expect(()=>refl.interpret("double(2,3)")).toThrow()
+        expect(() => refl.interpret("double(2,3)")).toThrow()
     })
-   
 
-    // test.todo("arr sort")
 
     it('numbers are objects', () => {
-        expect(refl.interpret("0.zero()")).toEqual(true)  
-        expect(refl.interpret("!0.one()")).toEqual(true)  
+        expect(refl.interpret("0.zero()")).toEqual(true)
+        expect(refl.interpret("!0.one()")).toEqual(true)
         expect(refl.interpret("!1.zero()")).toEqual(true)
         expect(refl.interpret("1.one()")).toEqual(true)
         expect(refl.interpret("!2.zero()")).toEqual(true)
@@ -576,23 +580,23 @@ describe(Refl, () => {
         expect(refl.interpret("'you'[2]=='u'")).toEqual(true)
     })
 
-    
+
     it('(safely) reopens classes', () => {
         refl.interpret('class Bar{}')
         refl.interpret('bar = Bar.new()')
         refl.interpret('class Bar{baz(){1}}')
         refl.interpret('newbar = Bar.new()')
         expect(refl.interpret("newbar.baz()")).toEqual(1)
-        expect(()=>refl.interpret("bar.baz()")).not.toThrow()
+        expect(() => refl.interpret("bar.baz()")).not.toThrow()
         expect(refl.interpret("bar.baz()")).toEqual(1)
         refl.interpret('class Bar{quux(){2}}')
-        expect(()=>refl.interpret("newbar.quux()")).not.toThrow()
+        expect(() => refl.interpret("newbar.quux()")).not.toThrow()
         expect(refl.interpret("newbar.quux()")).toEqual(2)
-        expect(()=>refl.interpret("bar.quux()")).not.toThrow()
+        expect(() => refl.interpret("bar.quux()")).not.toThrow()
         expect(refl.interpret("bar.quux()")).toEqual(2)
-        expect(()=>refl.interpret("newbar.baz()")).not.toThrow()
+        expect(() => refl.interpret("newbar.baz()")).not.toThrow()
         expect(refl.interpret("newbar.baz()")).toEqual(1)
-        expect(()=>refl.interpret("bar.baz()")).not.toThrow()
+        expect(() => refl.interpret("bar.baz()")).not.toThrow()
         expect(refl.interpret("bar.baz()")).toEqual(1)
     })
 
@@ -600,7 +604,7 @@ describe(Refl, () => {
         it('length', () => {
             expect(refl.interpret("arr=[1,2,3]; arr.length()")).toEqual(3)
         });
-        
+
         it('push', () => {
             expect(refl.interpret("arr=[1,2,3,4]; arr.push(5); arr")).toEqual([1, 2, 3, 4, 5])
         })
@@ -608,7 +612,7 @@ describe(Refl, () => {
         it('each', () => {
             refl.interpret("arr=[1,2,3]")
             refl.interpret("arr.each((e)=>print(e))")
-            expect(Refl.tracedOutput).toEqual([1,2,3])
+            expect(Refl.tracedOutput).toEqual([1, 2, 3])
         });
     })
 
@@ -629,7 +633,7 @@ describe(Refl, () => {
             expect(refl.interpret("Boolean.new(false).false()")).toEqual(true)
         })
         it('hashes', () => {
-            expect(refl.interpret("h=Hash.new({a:1});h")).toEqual({a:1})
+            expect(refl.interpret("h=Hash.new({a:1});h")).toEqual({ a: 1 })
             // expect(refl.interpret("Hash.new({a:1,b:2}).keys()")).toEqual(['a','b'])
         })
         it('lists', () => {
@@ -705,7 +709,7 @@ describe(Refl, () => {
             max = 85;
             fib(max)
             print(fmemo)`)
-            expect(Refl.tracedOutput).toEqual([[1,1,2,3,5,8,13,21,34,55,89,144,233,377,610,987,1597,2584,4181,6765,10946,17711,28657,46368,75025,121393,196418,317811,514229,832040,1346269,2178309,3524578,5702887,9227465,14930352,24157817,39088169,63245986,102334155,165580141,267914296,433494437,701408733,1134903170,1836311903,2971215073,4807526976,7778742049,12586269025,20365011074,32951280099,53316291173,86267571272,139583862445,225851433717,365435296162,591286729879,956722026041,1548008755920,2504730781961,4052739537881,6557470319842,10610209857723,17167680177565,27777890035288,44945570212853,72723460248141,117669030460994,190392490709135,308061521170129,498454011879264,806515533049393,1304969544928657,2111485077978050,3416454622906707,5527939700884757,8944394323791464,14472334024676220,23416728348467684,37889062373143900,61305790721611580,99194853094755490,160500643816367070,259695496911122560]])
+            expect(Refl.tracedOutput).toEqual([[1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309, 3524578, 5702887, 9227465, 14930352, 24157817, 39088169, 63245986, 102334155, 165580141, 267914296, 433494437, 701408733, 1134903170, 1836311903, 2971215073, 4807526976, 7778742049, 12586269025, 20365011074, 32951280099, 53316291173, 86267571272, 139583862445, 225851433717, 365435296162, 591286729879, 956722026041, 1548008755920, 2504730781961, 4052739537881, 6557470319842, 10610209857723, 17167680177565, 27777890035288, 44945570212853, 72723460248141, 117669030460994, 190392490709135, 308061521170129, 498454011879264, 806515533049393, 1304969544928657, 2111485077978050, 3416454622906707, 5527939700884757, 8944394323791464, 14472334024676220, 23416728348467684, 37889062373143900, 61305790721611580, 99194853094755490, 160500643816367070, 259695496911122560]])
         })
 
         it('tree', () => {
@@ -733,7 +737,7 @@ describe(Refl, () => {
             two = Node.new("two",three,nil)
             root = Node.new("root",one, two)
             root.visit((node) => print(node.label))`)
-            expect(Refl.tracedOutput).toEqual(["root","one","two","three"])
+            expect(Refl.tracedOutput).toEqual(["root", "one", "two", "three"])
         })
     })
 })

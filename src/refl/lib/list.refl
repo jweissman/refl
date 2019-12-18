@@ -4,9 +4,20 @@ class List {
         self._set(elements)
     }
 
+    all() { List.new(self) }
+
     first() { self[0] }
     last()  { self[self.length()-1] }
-    push(e) { self[self.length()]=e }
+    push(e) {
+        self[self.length()]=e
+        self
+    }
+
+    map(f) {
+        acc=[]
+        self.each((e) => acc.push(f(e)))
+        acc
+    }
 
     each(fn) { 
         i=0;
@@ -27,4 +38,33 @@ class List {
         }
         false
     }
+    #reduce(fn,initial) {
+    #    println("REDUCE", self.all())
+    #    acc = initial
+    #    self.each((e) => {
+    #        acc = fn(acc, e)
+    #    })
+    #    println("REDUCE RESULT", acc, self.all())
+    #    acc
+    #}
+
+    +(other) {
+        joined=[]
+        other.each((ch) => joined.push(ch))
+        self.each((ch) => joined.push(ch))
+        joined
+    } 
+
+    # to_s() {
+    #     self.map((e) => String.new(e.to_s())).join("")
+    # }
+
+    # join(tissue) {
+    #     joined=[self.first()]
+    #     self.each((ch) => {
+    #         joined.push(tissue)
+    #         joined.push(ch)
+    #     })
+    #     joined
+    # }
 }

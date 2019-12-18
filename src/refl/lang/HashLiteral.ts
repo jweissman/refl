@@ -16,7 +16,7 @@ export class HashLiteral extends ReflNode {
         //     instruct('hash_put'),
         // ])
 
-        let loadKeyValues: ReflProgram = this.kvPairs.flatMap((pair: KeyValuePair) => [
+        let loadKeyValues: ReflProgram = this.kvPairs.reverse().flatMap((pair: KeyValuePair) => [
             instruct('mark_list'),
             ...pair.value.instructions,
             instruct('push', { value: new MyrString(pair.key.name) }),
